@@ -3,3 +3,5 @@ appengine-generated/
 /nbproject/private/
 /nbproject/*
 .idea/*
+.env
+envOnline.php
