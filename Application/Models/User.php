@@ -34,10 +34,6 @@ class User{
      */
     private string $user_address;
     /**
-     * @var int Code postal
-     */
-    private int $user_postal;
-    /**
      * @var bool Utilisateur Actif
      */
     private bool $user_active = false;
@@ -164,22 +160,6 @@ class User{
     }
 
     /**
-     * @return int
-     */
-    public function getUserPostal(): int
-    {
-        return $this->user_postal;
-    }
-
-    /**
-     * @param int $user_postal
-     */
-    public function setUserPostal(int $user_postal): void
-    {
-        $this->user_postal = $user_postal;
-    }
-
-    /**
      * @return bool
      */
     public function isUserActive(): bool
@@ -254,7 +234,7 @@ class User{
      * @throws Exception Si aucun utilisateur ne correspond aux paramètres
      */
     public function getUser(int $user_id) : object{
-        $sql = "select user_id, user_mail, user_password, user_active, user_firstname, user_lastname, user_phone, user_address, user_postal, role_id from users where user_id=:user_id";
+        $sql = "select user_id, user_mail, user_password, user_active, user_firstname, user_lastname, user_phone, user_address, role_id from users where user_id=:user_id";
         $utilisateur =  Database::q($sql, [':user_id' => $user_id]);
         if ($utilisateur->rowCount() == 1){
             $user = $utilisateur->fetch(\PDO::FETCH_OBJ);
@@ -265,7 +245,6 @@ class User{
             $this->user_password = $user->user_password;
             $this->user_phone = $user->user_phone;
             $this->user_address = $user->user_address;
-            $this->user_postal = $user->user_postal;
             $this->user_active = $user->user_active;
             $this->role_id = $user->role_id;
             return $user;
@@ -280,7 +259,7 @@ class User{
      * @return int
      */
     public function addUser() : int{
-        $query = 'INSERT IGNORE INTO users SET user_firstname = :user_firstname, user_lastname = :user_lastname, user_mail = :user_mail, user_password = :user_password, user_phone =:user_phone, user_address = :user_address, user_postal =:user_postal, user_active =:user_active, role_id = :role_id';
+        $query = 'INSERT IGNORE INTO users SET user_firstname = :user_firstname, user_lastname = :user_lastname, user_mail = :user_mail, user_password = :user_password, user_phone =:user_phone, user_address = :user_address, user_active =:user_active, role_id = :role_id';
         try {
 
             Database::q($query,
@@ -291,7 +270,6 @@ class User{
                     ':user_password' => password_hash($this->user_password, PASSWORD_DEFAULT),
                     ':user_phone' => $this->user_phone,
                     ':user_address' => $this->user_address,
-                    ':user_postal' => $this->user_postal,
                     ':user_active' => $this->user_active,
                     ':role_id' => $this->role_id
                 ]
@@ -314,8 +292,7 @@ class User{
                  user_mail = :user_mail, 
                  user_password =:user_password, 
                  user_phone =:user_phone, 
-                 user_address = :user_address, 
-                 user_postal =:user_postal , 
+                 user_address = :user_address,
                  user_active =:user_active 
                     WHERE user_id = :user_id';
         try {
@@ -327,7 +304,6 @@ class User{
                     ':user_phone' => $this->user_phone,
                     ':user_password' => $this->user_password,
                     ':user_address' => $this->user_address,
-                    ':user_postal' => $this->user_postal,
                     ':user_active' => ($this->user_active) ? 1 : 0,
                     ':user_id' => $this->user_id
                 ]
