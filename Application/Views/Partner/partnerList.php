@@ -13,7 +13,7 @@
                 <li class="list-group-item d-flex justify-content-between align-items-start">
                     <img src="https://www.gravatar.com/avatar/'.md5('partner'.$partner->partner_id).'?s=50&r=pg&d=robohash" width="50" height="50" />
                     <div class="ms-2 me-auto">
-                        <div class="fw-bold"><a href="'.URI_ROOT.'/partner/information/'.$partner->partner_id.'">'.$this->cleanHTML($partner->partner_name).'</a> (Tel : <a href="tel:'.$partner->user_phone.'">'.$partner->user_phone.'</a>)</div>
+                        <div class="fw-bold"><a href="'.URI_ROOT.'/partner/information/'.$partner->partner_id.'">'.$this->cleanHTML($partner->partner_name).'</a></div>
                         Addresse : '.$this->cleanHTML($partner->user_address).' 
                     </div>
                     <div class="row align-items-center p-3">
