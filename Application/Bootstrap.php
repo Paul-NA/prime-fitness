@@ -1,6 +1,8 @@
 <?php
 require_once 'Core/Autoloader.php';
 require_once 'Config/env.php';
+require_once 'Config/envDatabase.php';
+require_once 'Config/envWebsite.php';
 require_once 'Config/Form.php';
 require_once 'Lang/Fr.php';
 

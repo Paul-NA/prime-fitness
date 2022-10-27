@@ -12,8 +12,8 @@ class Helper
         $headers = [
             'MIME-Version' => '1.0',  // Version MIME
             'Content-type' => 'text/html; charset=ISO-8859-1', // l'en tete Content-type pour le format HTML
-            'Reply-To' => EMAIL['MAIL'], // Mail de réponse
-            'From' => EMAIL['NAME'], // Expéditeur
+            'Reply-To' => EMAIL_SYSTEM, // Mail de réponse
+            'From' => EMAIL_NAME, // Expéditeur
             'Delivered-to' => $mailDest // Destinataire
         ];
         return mail($mailDest, $object, $message, $headers);

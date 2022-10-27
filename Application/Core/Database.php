@@ -13,7 +13,7 @@ class Database
 	public static function getInstance()
     {
 		if(null === static::$db) {
-			static::$db = new \PDO('mysql:dbname='.DATABASE['DBNAME'].';host='.DATABASE['HOST'], DATABASE['USER'], DATABASE['PASSWORD']);
+			static::$db = new \PDO('mysql:dbname='.DATABASE_DBNAME.';host='.DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD);
 			static::$db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 			static::$db->query('SET NAMES utf8;');
 		}
