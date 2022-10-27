@@ -1,29 +1,21 @@
 <?php
 
-use Application\Core\ControllerSecured;
+use Application\Core\ControllerSecuredAdmin;
 use Application\Models\Partners;
 use Application\Models\Structures;
 use Application\Models\User;
 
 /**
- * Contrôleur des requêtes en ajax 
+ * Contrôleur des requêtes en ajax pour administrateur uniquement
  */
-class ControllerAjax extends ControllerSecured {
+class ControllerAjax extends ControllerSecuredAdmin {
 
     private $users;
     private Partners $partners;
     private Structures $structures;
-    
-    /**
-     * Pour la recherche
-     * @var type
-     */
-    private $page;
-    private $search;
-    
+
     public function __construct() {
-    
-        if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' )
+        if(!empty($_SERVER['HTTP_SEARCH_HEADER']) && $_SERVER['HTTP_SEARCH_HEADER'] == 'AjaxSearchRequest' )
         {    
             $this->users = new User();
             $this->partners = new Partners();
@@ -32,6 +24,7 @@ class ControllerAjax extends ControllerSecured {
         else{
            die("Sorry this is not allowed");
         }
+
     }
     
     /**
@@ -40,68 +33,100 @@ class ControllerAjax extends ControllerSecured {
     public function index(){}
 
     
-    public function listing(){
-         
-    }
-    
     /**
      * Tout le système de recherche passe par se controller
      */
     public function search() {
         // On vérifie qu'un type de recherche à bien été passé
-        if($this->request->existParameter('type')){
-            
-            $this->search = ($this->request->existParameter('search') && $this->request->getParameter('search')) ? $this->request->getParameter('search') : '';
-            $this->page = ($this->request->existParameter('page') && is_numeric($this->request->getParameter('page'))) ? $this->request->getParameter('page') : 0;
-            $this->active = ($this->request->existParameter('active') && is_numeric($this->request->getParameter('active'))) ? (($this->request->getParameter('active') >=1) ? true : false) : null;
-            
-            $type = $this->request->getParameter('type');
-            if($type == 'partner'){
-                self::searchPartner();
+        //var_dump($_POST);
+
+        $search = $this->request->existParameter('search');
+        $status = $this->request->existParameter('status');
+        $type = $this->request->existParameter('type') ;
+
+        if($search && $status && $type){
+
+            $_search = $this->request->getParameter('search');
+            $_status = $this->request->getParameter('status');
+            $_type = $this->request->getParameter('type');
+
+            if($_type == 'partner'){
+                self::searchPartner( $_status, $_search);
             }
-            else if ($type == 'structure'){
+            else if ($_type == 'structure'){
+                self::searchStructure( $_status, $_search);
+            }
+            else if ($_type == 'user'){
                 self::searchStructure();
             }
             else{
-                echo 'no no rien';
+                echo 'désolé je n\'ai pas compris la question';
             }
         }
         // On à pas de type dans les recherches
         else{
-            $this->redirect('/');
+            echo '<div>Désolé le formulaire n\'est pas valide';
         }
     }
 
-    private function searchPartner() : string {
-        // Requête pour rechercher tous les partenaires avec les options possibles (terme de la recherche, la page, actif/non actif/ et null pour ignorer)
-        $result = $this->partners->search($this->search, $this->page, $this->active);
+    private function searchPartner(string $status, string $search) {
+        $page = 0;
+        /**
+         * On a récupéré notre liste de partenaire et on à retourné la liste avec comme clé de tableau les user_id pour selectioner les users
+         */
+        $partner = new Partners();
+        $listPartner = $partner->searchB($search, $page, (($status == 'actif') ? true : (($status == 'inactif') ? false : null)));
+
+        /**
+         * On récupère les clés sur la liste
+         */
+        $userKey = array_keys($listPartner);
+        $u = new User();
+        $userList = (count($userKey) > 0) ? $u->getUSerByUsersid($userKey) : [];
+
         $this->generateView(
             // paramètre à envoyé à la vue
             array(
-                'partnerList' => $result
-            )  
+                'total_partner' => $partner->getTotalPartner(),
+                'current_page' => $page,
+                'partner_list' => $listPartner,
+                'partner_list_user' => $userList,
+            )
             // vue à affiché     
-            , 'Partner'
+            , 'searchListPartner'
             // On ne recherche pas la vue dans le dossier vue du Controller on lui passe le dossier de la vue que l'on souhaite.
-            , 'Partner'
+            , 'Ajax'
             // on change aussi de layout pour un autre complètement vide
             , 'LayoutEmpty'
         );
-    
     }
     
-    private function searchStructure() {
-        // Requête pour rechercher toutes les structures avec les options possibles (terme de la recherche, la page, actif/non actif/ et null pour ignorer)
-        $result = $this->structures->search($this->search, $this->page, $this->active);
+    private function searchStructure(string $status, string $search) {
+        $page = 0;
+        /**
+         * On a récupéré notre liste de partenaire et on à retourné la liste avec comme clé de tableau les user_id pour selectioner les users
+         */
+        $structures = new Structures();
+        $listStructures = $structures->searchB($search, $page, (($status == 'actif') ? true : (($status == 'inactif') ? false : null)));
+
+        /**
+         * On récupère les clés sur la liste
+         */
+        $userKey = array_keys($listStructures);
+        $u = new User();
+        $usersList = (count($userKey) > 0) ? $u->getUSerByUsersid($userKey) : [];
+
         $this->generateView(
-            // parameter à envoyé à la vue
+        // paramètre à envoyé à la vue
             array(
-                'structures_list' => $result
-            )  
-            // vue à affiché     
-            , 'structureList'
+                'current_page' => $page,
+                'structures_list' => $listStructures,
+                'structures_list_users' => $usersList,
+            )
+            // vue à affiché
+            , 'searchListStructure'
             // On ne recherche pas la vue dans le dossier vue du Controller on lui passe le dossier de la vue que l'on souhaite.
-            , 'Structure'
+            , 'Ajax'
             // on change aussi de layout pour un autre complètement vide
             , 'LayoutEmpty'
         );

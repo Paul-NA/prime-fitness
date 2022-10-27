@@ -33,6 +33,8 @@ include PATH_VIEW.'_header.php';
 </main>
 
 <?php
+
+include PATH_VIEW . 'Modals/SearchModal.php';
 // Ajout du modal pour activer/désactiver un partenaire
 include PATH_VIEW . 'Modals/EnableDisablePartnerModal.php';
 // Ajout du modal pour Ajouter un nouveau partenaire

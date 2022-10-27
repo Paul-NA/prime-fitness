@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title><?= $titre ?? 'Aucun titre n\'a été fourni !' ?></title>
+    <title><?php echo $titre ?? 'Aucun titre n\'a été fourni !' ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Gestionnaire de salles de Sport ECF décembre 2022">
 
@@ -11,15 +11,15 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <!-- Style Css -->
-    <link href="<?= URI_ROOT;?>/Assets/Css/Style.css" rel="stylesheet">
+    <link href="<?php echo URI_ROOT;?>/Assets/Css/Style.css" rel="stylesheet">
 
     <!-- Favicons -->
-    <link rel="icon" href="<?= URI_ROOT;?>/Assets/Images/favicon.svg">
-    <link rel="apple-touch-icon" href="<?= URI_ROOT;?>/Assets/Images/favicon.svg" sizes="180x180">
+    <link rel="icon" href="<?php echo URI_ROOT;?>/Assets/Images/favicon.svg">
+    <link rel="apple-touch-icon" href="<?php echo URI_ROOT;?>/Assets/Images/favicon.svg" sizes="180x180">
     <meta name="theme-color" content="#7952b3">
 
-    <base href="<?= URI_ROOT;?>" >
-    <link rel="canonical" href="<?= URI_ROOT;?>">
+    <base href="<?php echo URI_ROOT;?>" >
+    <link rel="canonical" href="<?php echo URI_ROOT;?>">
 
 <?php
 /**

@@ -38,7 +38,9 @@ const REGEX_IS_VALID_PLACEHOLDER = 'entité active = 1, inactive = 0';
  * Ainsi si un nous vous voulons changer de type d'id par un du genre : PTN_6545548
  * On aurait juste à modifier la regex afin qu'elle se répercute dans tout le site.
  */
+const REGEX_USER_ID = '[\p{N}]{1,11}';
 const REGEX_PARTNER_ID = '[\p{N}]{1,11}';
+const REGEX_STRUCTURE_ID = '[\p{N}]{1,11}';
 
 
 /*

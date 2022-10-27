@@ -1,6 +1,6 @@
 <?php
 
-$this->titre = 'Prime-Fitness - '. $this->cleanHTML($partner_info->partner_name) . ' information';
+$this->titre = 'Prime-Fitness - '. $this->cleanHTML($partner_info->getPartnerName()) . ' information';
 
 array_push($this->jsFiles, URI_ROOT.'/Assets/Javascript/application.js');
 
@@ -21,24 +21,32 @@ if(!empty($user_partner_info)) :
                     <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                 </svg>
                 <div class="float-start">
-                    <h1 class="h6 mb-0 lh-1"><?php echo $this->cleanHTML($partner_info->partner_name);?></h1>
+                    <h1 class="h6 mb-0 lh-1"><?php echo $this->cleanHTML($partner_info->getPartnerName());?></h1>
                     <small class="d-none d-sm-inline"">Information partenaire</small>
                 </div>
                 <?php
                 if($user_info->getRoleId() == ROLE_ADMIN) :?>
+
+                    <button type="button" class="btn btn-danger display-inline float-end mx-1" style="float: right;"
+                            data-bs-toggle="modal"
+                            data-bs-target="#DeleteUser"
+                            data-bs-csrf="<?php echo $csrf_token?>"
+                            data-bs-userId="<?php echo $partner_info->getUserId();?>">
+                        <i class="bi bi-x-square"></i><span class="d-none d-sm-inline"> Supprimer</span>
+                    </button>
                 <button type="button" class="btn btn-primary display-inline  float-end" style="float: right;"
                         data-bs-toggle="modal"
                         data-bs-target="#EditPartner"
                         data-bs-csrf="<?php echo $csrf_token?>"
-                        data-bs-partnerId="<?php echo $partner_info->partner_id;?>"
+                        data-bs-partnerId="<?php echo $partner_info->getPartnerId();?>"
                         data-bs-firstname="<?php echo $this->cleanHTML($user_partner_info->getUserFirstName());?>"
                         data-bs-lastname="<?php echo $this->cleanHTML($user_partner_info->getUserLastName());?>"
                         data-bs-mail="<?php echo $this->cleanHTML($user_partner_info->getUserMail());?>"
                         data-bs-phone="<?php echo $this->cleanHTML($user_partner_info->getUserPhone());?>"
                         data-bs-address="<?php echo $this->cleanHTML($user_partner_info->getUserAddress());?>"
-                        data-bs-socialName="<?php echo $this->cleanHTML($partner_info->partner_name);?>"
+                        data-bs-socialName="<?php echo $this->cleanHTML($partner_info->getPartnerName());?>"
                         data-bs-userstatus="<?php echo (($user_partner_info->isUserActive()) ? 1 : 0);?>"
-                        data-bs-partnerStatus="<?php echo (($partner_info->is_active) ? 1 : 0);?>">
+                        data-bs-partnerStatus="<?php echo (($partner_info->getPartnerActive()) ? 1 : 0);?>">
                     <i class="bi bi-pencil-square"></i><span class="d-none d-sm-inline"> éditer le partenaire</span>
                 </button>
                 <?php endif; ?>
@@ -79,9 +87,9 @@ if(!empty($user_partner_info)) :
                                     <div class="card-body">
                                         <h5 class="card-title">Partenaire Information</h5>
                                         <p class="card-text">
-                                            <b>Nom :</b> <?php echo $this->cleanHTML($partner_info->partner_name);?><br />
+                                            <b>Nom :</b> <?php echo $this->cleanHTML($partner_info->getPartnerName());?><br />
                                             <b>Adresse :</b> <?php echo $this->cleanHTML($user_partner_info->getUserAddress());?><br />
-                                            <b>Status partner: </b> <?php echo (($partner_info->is_active) ? '<b style="color: green">Actif</b>' : '<b   style="color: red">Inactif</b>');?><br />
+                                            <b>Status partner: </b> <?php echo (($partner_info->getPartnerActive()) ? '<b style="color: green">Actif</b>' : '<b   style="color: red">Inactif</b>');?><br />
                                         </p>
                                     </div>
                                 </div>
@@ -122,7 +130,7 @@ if(!empty($user_partner_info)) :
                             data-bs-toggle="modal"
                             data-bs-target="#AddNewStructure"
                             data-bs-csrf="<?php echo $csrf_token?>"
-                            data-bs-partnerId="<?php echo $partner_info->partner_id;?>">
+                            data-bs-partnerId="<?php echo $partner_info->getPartnerId();?>">
                         <i class="bi bi-plus-square"></i><span class="d-none d-sm-inline"> Ajouter une structure</span>
                     </button>
                 <?php endif; ?>
@@ -146,9 +154,11 @@ if(!empty($user_partner_info)) :
  * Inclusion de chaque modal nécessaire seulement pour les administrateurs
  */
 if($user_info->getRoleId() == ROLE_ADMIN) {
+    include PATH_VIEW . 'Modals/SearchModal.php';
     include PATH_VIEW . 'Modals/EnableDisableStructureModal.php';
     include PATH_VIEW . 'Modals/EnableDisableServiceModal.php';
     include PATH_VIEW . 'Modals/AddDeleteServiceModal.php';
+    include PATH_VIEW . 'Modals/DeleteUserModal.php';
     include PATH_VIEW . 'Modals/AddStructureModal.php';
     include PATH_VIEW . 'Modals/EditPartnerModal.php';
 }

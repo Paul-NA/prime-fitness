@@ -8,27 +8,31 @@ if(!empty($services_partner)){
     $i = 0;
     $listA = '';
     $listB = '';
-    foreach($services_partner as $service){
+    foreach($services_partner as $partnerService){
 
         //on regarde si la structure possède l'option
-        $service_structure = (array_key_exists($service->partner_service_id , $services_structure)) ? $services_structure[$service->partner_service_id] : null;
+        $service = (array_key_exists($partnerService->getServiceId() , $services_list)) ? $services_list[$partnerService->getServiceId()] : null;
 
-        $partner_active = $service->is_active;
+        //on regarde si la structure possède l'option
+        $service_structure = (array_key_exists($partnerService->getPartnerServiceId() , $services_structure)) ? $services_structure[$partnerService->getPartnerServiceId()] : null;
+
+
+        $partner_active = $partnerService->getPartnerServiceActive();
         $active_alert = (!$partner_active);
         $alert = (($active_alert) ? '<i class="bi bi-exclamation-triangle" title="cette option est désactivé dans le partner"> </i> ' : '' );
         $text = '
                             <li class="list-group-item d-flex justify-content-between align-items-start fw-semibold " >
-                                <div class="float-start">'.$this->cleanHTML($service->service_name).'</div>
+                                <div class="float-start">'.$this->cleanHTML($service->getServiceName()).'</div>
                                 <div class="justify-content-end">
                                     <button class="btn badge btn-'.(($service_structure !== null && $partner_active) ? 'success' : ((!$partner_active) ? 'warning' : 'danger')).'"'.
                                     (($user_info->getRoleId() == ROLE_ADMIN)
                                             ?
-                                        ' id="partnerID-'.$service->service_id.'" 
+                                        ' id="partnerID-'.$service->getServiceId().'" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#EnableDisableService" 
                                         data-bs-csrf="'.$csrf_token.'"
-                                        data-bs-service-name="'.$this->cleanHTML($service->service_name).'" 
-                                        data-bs-service-id="'.$service->partner_service_id.'" 
+                                        data-bs-service-name="'.$this->cleanHTML($service->getServiceName()).'" 
+                                        data-bs-service-id="'.$partnerService->getPartnerServiceId().'" 
                                         data-bs-service-type="structure"
                                         data-bs-service-type-id="'.$structure_info->getStructureId().'"
                                         data-bs-service-status="'.( $service_structure !== null ? '0' : '1').'"' : '').'>'.$alert.(($service_structure) ? ((!$partner_active) ? 'Désactivé' : 'Actif') : 'Inactif').'

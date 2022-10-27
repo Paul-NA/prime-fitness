@@ -53,7 +53,6 @@ class User{
     {
         return $this->user_id;
     }
-
     /**
      * @param int $user_id
      */
@@ -62,7 +61,6 @@ class User{
         $this->user_id = $user_id;
     }
 
-
     /**
      * @return string
      */
@@ -70,7 +68,6 @@ class User{
     {
         return $this->user_firstname;
     }
-
     /**
      * @param string $user_firstname
      */
@@ -86,7 +83,6 @@ class User{
     {
         return $this->user_lastname;
     }
-
     /**
      * @param string $user_lastname
      */
@@ -102,7 +98,6 @@ class User{
     {
         return $this->user_mail;
     }
-
     /**
      * @param string $user_mail
      */
@@ -118,7 +113,6 @@ class User{
     {
         return $this->user_password;
     }
-
     /**
      * @param mixed $user_password
      */
@@ -134,7 +128,6 @@ class User{
     {
         return $this->user_phone;
     }
-
     /**
      * @param int $user_phone
      */
@@ -150,7 +143,6 @@ class User{
     {
         return $this->user_address;
     }
-
     /**
      * @param string $user_address
      */
@@ -166,7 +158,6 @@ class User{
     {
         return $this->user_active;
     }
-
     /**
      * @param bool $user_active
      */
@@ -182,7 +173,6 @@ class User{
     {
         return $this->user_created_date;
     }
-
     /**
      * @param string $user_created_date
      */
@@ -198,7 +188,6 @@ class User{
     {
         return $this->role_id;
     }
-
     /**
      * @param int $role_id
      */
@@ -223,6 +212,20 @@ class User{
             return (password_verify($password, $user->user_password)) ? $user->user_id : 0;
         }
         return 0;
+    }
+
+
+    public function getUserv2(int $user_id) : User{
+        $query = 'Select * from users where user_id = :user_id ';
+        $user = Database::q($query, [
+                ':user_id' => $user_id
+            ]
+        );
+        if ($user->rowCount() == 1){
+            $user->setFetchMode(\PDO::FETCH_CLASS, 'Application\Models\User');
+            return $user->fetch();
+        }
+        return new User();
     }
 
     /**
@@ -252,6 +255,16 @@ class User{
         else{
             throw new \Exception("Aucun utilisateur ne correspond aux identifiants fournis");
         }
+    }
+
+    public function getUSerByUsersId(array $userIdList) : array{
+        $query = 'Select * from users WHERE user_id IN ('.implode(', ', $userIdList).') ';
+        $partnerServicesList = Database::q($query);
+        //$partnerServicesList = Database::q($query, [':list_id' => implode($userIdList)]);
+        if ($partnerServicesList->rowCount() >= 1){
+            return array_column($partnerServicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\User'), null, 'user_id');
+        }
+        return array();
     }
 
     /**
@@ -315,9 +328,34 @@ class User{
         return true;
     }
 
-    public function getMailsByUserListId(array $users_id){
-        $query = 'select * from users WHERE user_id IN (:user_id)';
-        $result = Database::q($query, [':user_id' => implode(', ', $users_id)]);
-        return $result->fetchAll(\PDO::FETCH_OBJ);
+
+    /**
+     * @param int $user_id
+     * @return bool
+     */
+    public function deleteUser(int $user_id) : bool{
+        $query = 'delete from users where user_id = :user_id';
+        try{
+            Database::q($query , [
+                ':user_id' => $user_id
+            ]);
+            return true;
+        }
+        catch (\Exception $e){
+            return false;
+        }
+    }
+
+    public function deleteUsersList(array $users_id_list) : bool{
+        $query = 'delete from users where user_id IN ('.implode(', ', $users_id_list).')';
+        try{
+            Database::q($query);
+            return true;
+        }
+        catch (\Exception $e){
+            var_dump($e);
+            die();
+            return false;
+        }
     }
 }

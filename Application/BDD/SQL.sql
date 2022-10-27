@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS partners (
     partner_id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     partner_name varchar(90) NOT NULL,
     user_id int(11) UNIQUE NOT NULL,
-    partner_active tinyint(1) NOT NULL DEFAULT 0,
+    partner_active tinyint(1) NOT NULL DEFAULT 1,
     FOREIGN KEY (user_id) REFERENCES users (user_id) on delete cascade
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS structures (
   structure_name varchar(90) NOT NULL,
   user_id int(11) UNIQUE NOT NULL,
   partner_id int(11) NOT NULL,
-  structure_active tinyint(1) NOT NULL DEFAULT 0,
+  structure_active tinyint(1) NOT NULL DEFAULT 1,
   FOREIGN KEY (user_id) REFERENCES users (user_id) on delete cascade,
   FOREIGN KEY (partner_id) REFERENCES partners (partner_id) on delete cascade
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

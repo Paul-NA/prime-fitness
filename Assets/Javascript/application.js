@@ -422,8 +422,32 @@ if(structureEdit) {
     });
 }
 
-// TODO suppression d'un partenaire oui ou non ?
+/******************************************************************/
 
+/**
+ * Gestion de la Modale pour activer/désactiver un service (partenaire et structure)
+ */
+const deleteUser = document.getElementById('DeleteUser');
+if(deleteUser){
+    /**
+     * Assignation pour la modale
+     */
+    deleteUser.addEventListener('show.bs.modal', event => {
+        // Button that triggered the modal
+        const button = event.relatedTarget;
+        // Extraction des infos contenue dans les boutons data-* attributes
+        const _userId                   = button.getAttribute('data-bs-userId');
+        const _csrf                     = button.getAttribute('data-bs-csrf');
+
+        // selection des elements du modal que l'on souhaite
+        const modalUserId               = deleteUser.querySelector('.userId');
+        const modalCsrf                 = deleteUser.querySelector('.userCsrf');
+
+        // Modification du contenue dans le modal
+        modalUserId.value               = _userId;
+        modalCsrf.value                 = _csrf;
+    });
+}
 /******************************************************************/
 
 /**
@@ -536,3 +560,124 @@ if(structureEnableDisable){
     });
 }
 
+/**
+ * Gestion de la recherche Ajax
+ */
+const search = document.getElementById('SearchModal');
+if(search) {
+
+
+    const searchRolePartner = document.getElementById('searchRolePartner');
+    const searchRoleStructure = document.getElementById('searchRoleStructure'); // on peut ne pas l'ajouter
+    const searchStatusActif = document.getElementById('searchStatusActif');
+    const searchStatusInactif = document.getElementById('searchStatusInactif'); // on peut ne pas l'ajouter
+    const searchStatusAll = document.getElementById('searchStatusAll');
+    const resultText = search.querySelector('.searchResult');
+    const resultTextdefault = resultText.textContent;
+
+    //alert(searchRoleStructure.getAttributeNames());
+    const searchBar = document.getElementById('SearchBar');
+
+
+
+    if (searchBar) {
+        const delay = 400;
+
+        function debounce(callback, delay) {
+            var timer = null;
+            return function () {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    callback.apply(context, args);
+                }, delay);
+            }
+        }
+
+        searchBar.addEventListener('keyup', debounce(function (e) {
+            const typeRole = (searchRolePartner.checked) ? 'partner' : 'structure';
+            const status = (searchStatusAll.checked) ? 'all' : ((searchStatusActif.checked) ? 'actif' : 'inactif');
+            // recherche de >= 1 caractère
+            if (this.value.length >= 1) {
+                post(status, typeRole, this.value);
+            }
+            // On repasse au texte par defaut
+            else if(this.value.length < 1){
+                resetResult();
+            }
+        }, delay))
+
+    }
+
+    searchRolePartner.addEventListener("click", event => {
+        const typeRole = (searchRolePartner.checked) ? 'partner' : 'structure';
+        const status = (searchStatusAll.checked) ? 'all' : ((searchStatusActif.checked) ? 'actif' : 'inactif');
+        post(status, typeRole, searchBar.value);
+    });
+
+    searchRoleStructure.addEventListener("click", event => {
+        const typeRole = (searchRolePartner.checked) ? 'partner' : 'structure';
+        const status = (searchStatusAll.checked) ? 'all' : ((searchStatusActif.checked) ? 'actif' : 'inactif');
+        post(status, typeRole, searchBar.value);
+    });
+
+    searchStatusActif.addEventListener("click", event => {
+        const typeRole = (searchRolePartner.checked) ? 'partner' : 'structure';
+        const status = (searchStatusAll.checked) ? 'all' : ((searchStatusActif.checked) ? 'actif' : 'inactif');
+        post(status, typeRole, searchBar.value);
+    });
+
+    searchStatusInactif.addEventListener("click", event => {
+        const typeRole = (searchRolePartner.checked) ? 'partner' : 'structure';
+        const status = (searchStatusAll.checked) ? 'all' : ((searchStatusActif.checked) ? 'actif' : 'inactif');
+        post(status, typeRole, searchBar.value);
+    });
+
+    searchStatusAll.addEventListener("click", event => {
+        const typeRole = (searchRolePartner.checked) ? 'partner' : 'structure';
+        const status = (searchStatusAll.checked) ? 'all' : ((searchStatusActif.checked) ? 'actif' : 'inactif');
+        post(status, typeRole, searchBar.value);
+    });
+
+    /**
+     * Affichage d'origine si on ferme la modale
+     */
+    search.addEventListener('hidden.bs.modal', event => {
+        resetResult();
+    });
+
+    /**
+     * Post ajax avec fetch
+     */
+    function post(status, typeRole, search){
+        fetch(rootPath + "/ajax/search", {
+            method: 'POST',
+            body:
+                "type=" + typeRole + // on passe le partenaire id
+                "&status=" + status +  // on passe le nouveau status
+                "&search="+ search, // on passe le type de requêtes (pour appeler la fonction adéquate
+            headers: {
+                "Search-Header": "AjaxSearchRequest",
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        })
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (data) {
+                //alert(data);
+                if (data !== 'false') {
+                    // si le partenaire est inactif on l'active
+                    resultText.innerHTML = data;
+                }
+            }).catch(error => console.error('Error:', error));
+    }
+
+    /**
+     * Reset a la valeur par défaut du contenu de la recherche
+     */
+    function resetResult(){
+        resultText.innerHTML = resultTextdefault;
+    }
+}

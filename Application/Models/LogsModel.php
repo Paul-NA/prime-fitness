@@ -11,19 +11,20 @@ class LogsModel{
     private string $log_time;
     private string $log_text;
     private int $user_id;
-    /**
-     * @param int $user_id
-     */
-    public function setUserId(int $user_id): void
-    {
-        $this->user_id = $user_id;
-    }
+
     /**
      * @return int
      */
-    public function getUserId(): int
+    public function getLogId(): int
     {
-        return $this->user_id;
+        return $this->log_id;
+    }
+    /**
+     * @param int $log_id
+     */
+    public function setLogId(int $log_id): void
+    {
+        $this->log_id = $log_id;
     }
 
     /**
@@ -33,7 +34,6 @@ class LogsModel{
     {
         return $this->log_type;
     }
-
     /**
      * @param string $log_type
      */
@@ -49,7 +49,6 @@ class LogsModel{
     {
         return $this->log_type_id;
     }
-
     /**
      * @param int $log_type_id
      */
@@ -73,7 +72,6 @@ class LogsModel{
     {
         return $this->log_text;
     }
-
     /**
      * @param string $log_text
      */
@@ -83,35 +81,44 @@ class LogsModel{
     }
 
     /**
+     * @param int $user_id
+     */
+    public function setUserId(int $user_id): void
+    {
+        $this->user_id = $user_id;
+    }
+    /**
      * @return int
      */
-    public function getLogId(): int
+    public function getUserId(): int
     {
-        return $this->log_id;
+        return $this->user_id;
     }
 
-    /**
-     * @param int $log_id
-     */
-    public function setLogId(int $log_id): void
-    {
-        $this->log_id = $log_id;
-    }
 
 
     /**
-     * @return void
+     * Ajoute un log, et retourne un bool si success ou erreur
+     * @return bool
      */
-    public function addLog() : void {
-        Database::q('INSERT IGNORE INTO logs SET log_type = :log_type, log_type_id = :log_type_id, log_text = :log_text, user_id = :user_id',
-            [
-                ':log_type' => $this->log_type,
-                ':log_type_id' => $this->log_type_id,
-                ':log_text' => $this->log_text,
-                ':user_id' => $this->user_id
-            ]
-        );
+    public function addLog() : bool {
+        $query = 'INSERT IGNORE INTO logs SET log_type = :log_type, log_type_id = :log_type_id, log_text = :log_text, user_id = :user_id';
+        try {
+            Database::q($query,
+                [
+                    ':log_type' => $this->log_type,
+                    ':log_type_id' => $this->log_type_id,
+                    ':log_text' => $this->log_text,
+                    ':user_id' => $this->user_id
+                ]
+            );
+            return true;
+        }
+        catch (\Exception $e){
+            return false;
+        }
     }
+
     /**
      * On mes jamais à jours un log !
      * @param string $logType
@@ -119,7 +126,7 @@ class LogsModel{
      * @param string $logText
      * @return void
      */
-    public function UpdateLogs(string $logType, int $logTypeId,string $logText) : void {}
+    public function updateLogs(string $logType, int $logTypeId,string $logText) : void {}
 
     /**
      * Savoir le nombre de logs
@@ -127,8 +134,18 @@ class LogsModel{
      * @param int $user_id
      * @return int
      */
-    public function CountLog(int $user_id): int{
-        
+    public function countLogs(int $user_id): int{
+        $query = 'select count(*) from logs where user_id = :user_id';
+        try {
+            $count = Database::q($query, [
+               ':id_user' => $user_id
+            ]);
+
+            return $count->fetch();
+        }
+        catch (\Exception $e){
+            return 0;
+        }
     }
     /**
      * Voir l'intégralité des logs
@@ -138,13 +155,7 @@ class LogsModel{
      * @param type $page
      * @return array
      */
-    public function ShowLog(int $user_id, $max_log, $page): array{
-        
-        /**
-         * Ici on doit rajouter les logs avec un or pour les structures, les partners, les et les permissions en général pour tout log
-         * puis voir qui à fait quoi !
-         */
-        
+    public function showLogs(int $user_id, $max_log, $page): array{
         $sql = "select log_text, log_time from logs where user_id=:user_id";
         $utilisateur =  Database::q($sql, [':user_id' => $user_id]);
         $user = $utilisateur->fetchAll();
@@ -154,11 +165,19 @@ class LogsModel{
     
     /**
      * On ne delete jamais un log !
-     * 
      * @param int $log_id
-     * @return void
+     * @return bool
      */
-    public function DeleteLogs(int $log_id) : void {
-
+    public function deleteLogs(int $log_id) : bool {
+        $query = 'delete from logs where log_id = :log_id';
+        try{
+            Database::q($query, [
+                ':log_id' => $log_id
+            ]);
+            return true;
+        }
+        catch (\Exception $e){
+            return false;
+        }
     }
 }

@@ -98,6 +98,16 @@ class StructuresServices{
         );
     }
 
+    /*public function removeServie($partner_service_id, $structure_id) : bool{
+        $query = 'DELETE FROM structures_services WHERE partner_service_id = :partner_service_id and structure_id = :structure_id ';
+        try {
+            Database::q($query, [':partner_service_id' => $partner_service_id, ':structure_id' => $structure_id]);
+            return true;
+        }
+        catch (\Exception $e){
+            return false;
+        }
+    }*/
 
     private function RemoveServie($partner_service_id, $structure_id) : bool{
         $query = 'DELETE FROM structures_services WHERE partner_service_id = :partner_service_id and structure_id = :structure_id ';
@@ -128,11 +138,20 @@ class StructuresServices{
         return [];
     }
 
-    public function getServiceListByStructureId(int $partner_id) : array{
-        $query = 'Select * from structures_services where structure_id = :structure_id ';
-        $structureList = Database::q($query, [':structure_id' => $partner_id]);
+    public function getStructureServiceListByPartnerServiceId(int $partner_service_id) : array{
+        $query = 'Select * from structures_services where partner_service_id = :partner_service_id ';
+        $structureList = Database::q($query, [':partner_service_id' => $partner_service_id]);
         if ($structureList->rowCount() >= 1){
-            return array_column($structureList->fetchAll(\PDO::FETCH_OBJ), null, 'partner_service_id'); //$structureList->fetchAll(\PDO::FETCH_OBJ);
+            return array_column($structureList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\StructuresServices'), null, 'structure_id');
+        }
+        return array();
+    }
+
+    public function getStructureServiceListByStructureId(int $structure_id) : array{
+        $query = 'Select * from structures_services where structure_id = :structure_id ';
+        $structureList = Database::q($query, [':structure_id' => $structure_id]);
+        if ($structureList->rowCount() >= 1){
+            return array_column($structureList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\StructuresServices'), null, 'partner_service_id');
         }
         return array();
     }

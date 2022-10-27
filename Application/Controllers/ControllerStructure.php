@@ -3,6 +3,7 @@
 use Application\Core\ControllerSecured;
 use Application\Models\Partners;
 use Application\Models\PartnersServices;
+use Application\Models\Services;
 use Application\Models\Structures;
 use Application\Models\StructuresServices;
 use Application\Models\User;
@@ -32,11 +33,10 @@ class ControllerStructure extends ControllerSecured {
 
             // On récupère les informations de la structure
             $structure = new Structures();
-            $structure->setStructureId($this->request->getParameter('id'));
-            $structureInst = $structure->getStructure();
+            $structureInst = $structure->getStructure($this->request->getParameter('id'));
             //$structureInst = $structure->getStructureByStructureId($this->request->getParameter('id'));
 
-            // Si la structure existe l'id est supérieur à zéro  et que (l'utilisateur courant est admin ou que l'user_id de la structure appartient à l'utilisateur c
+            // Si la structure existe l'id est supérieur à zéro et que (l'utilisateur courant est admin ou que l'user_id de la structure appartient à l'utilisateur c
             if($structureInst->getStructureId() > 0 && ($user->getRoleId() == ROLE_ADMIN || $structureInst->getUserId() == $user->getUserId())){
                 // On récupère les informations du partenaire (on doit savoir s'il est actif ou non)
                 $partner = new Partners();
@@ -45,14 +45,18 @@ class ControllerStructure extends ControllerSecured {
                 $structureUser = new User();
                 $structureUser->getUser($structureInst->getUserId());
 
+                // On doit vérifier si l'id de la structure existe sinon on redirigera vers la liste des partenaires
+                $services = new Services();
+                $servicesList = $services->getAllServices();
+
                 // Les services du partenaire
                 $partnerService = new PartnersServices();
-                $servicesInst = $partnerService->getServiceStructure($partnerInst->partner_id, $structureInst->getStructureId());
-                $servicesPartner = $partnerService->getServiceListByPartnerId($partnerInst->partner_id);
+                $servicesInst = $partnerService->getServiceStructure($partnerInst->getPartnerId(), $structureInst->getStructureId());
+                $servicesPartner = $partnerService->getPartnerServiceListByPartnerId($partnerInst->getPartnerId());
 
                 // les services de la structure
                 $structurerService = new StructuresServices();
-                $servicesStructure = $structurerService->getServiceListByStructureId($structureInst->getStructureId());
+                $servicesStructure = $structurerService->getStructureServiceListByStructureId($structureInst->getStructureId());
 
                 // On génère un csrf
                 $this->genCsrf();
@@ -66,7 +70,8 @@ class ControllerStructure extends ControllerSecured {
                         'partner_info' => $partnerInst,
                         'csrf_token' => $this->request->getSession()->getAttribute('csrf_token'),
                         'action_id' => $this->request->getParameter('id'),
-                        'services_list' => $servicesInst,
+
+                        'services_list' => $servicesList,
                         'services_partner' => $servicesPartner,
                         'services_structure' => $servicesStructure
                     ));

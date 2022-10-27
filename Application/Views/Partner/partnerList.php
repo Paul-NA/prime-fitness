@@ -8,19 +8,30 @@
         <div class="mb-2">
             <ol class="list-group">
                 <?php
-                 foreach ($partner_list as $partner) {
-                     echo "\r\n".'
+                if(count($partner_list) >= 1) {
+                    foreach ($partner_list as $partner) {
+                        $user = $partner_list_user[$partner->getUserId()];
+                        echo "\r\n" . '
                 <li class="list-group-item d-flex justify-content-between align-items-start">
-                    <img src="https://www.gravatar.com/avatar/'.md5('partner'.$partner->partner_id).'?s=50&r=pg&d=robohash" width="50" height="50" />
+                    <img src="https://www.gravatar.com/avatar/' . md5('partner' . $partner->getPartnerId()) . '?s=50&r=pg&d=robohash" width="50" height="50" />
                     <div class="ms-2 me-auto">
-                        <div class="fw-bold"><a href="'.URI_ROOT.'/partner/information/'.$partner->partner_id.'">'.$this->cleanHTML($partner->partner_name).'</a></div>
-                        Addresse : '.$this->cleanHTML($partner->user_address).' 
+                        <div class="fw-bold"><a href="' . URI_ROOT . '/partner/information/' . $partner->getPartnerId() . '">' . $this->cleanHTML($partner->getPartnerName()) . '</a></div>
+                        Addresse : ' . $this->cleanHTML($user->getUserAddress()) . ' 
                     </div>
                     <div class="row align-items-center p-3">
-                        <button class="btn badge btn-'.(($partner->is_active) ? 'success' : 'danger').'" id="partnerID-'.$partner->partner_id.'" data-bs-toggle="modal" data-bs-target="#EnableDisablePartner" data-bs-partner-name="'.$this->cleanHTML($partner->partner_name).'" data-bs-partner-id="'.$partner->partner_id.'" data-bs-partner-status="'.(($partner->is_active) ? '0' : '1').'">'.(($partner->is_active) ? 'Actif' : 'Inactif').'</button>
+                        <button class="btn badge btn-' . (($partner->getPartnerActive()) ? 'success' : 'danger') . '" id="partnerID-' . $partner->getPartnerId() . '" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#EnableDisablePartner" 
+                                data-bs-partner-name="' . $this->cleanHTML($partner->getPartnerName()) . '" 
+                                data-bs-partner-id="' . $partner->getPartnerId() . '" 
+                                data-bs-partner-status="' . (($partner->getPartnerActive()) ? '0' : '1') . '">' . (($partner->getPartnerActive()) ? 'Actif' : 'Inactif') . '</button>
                     </div>
-                </li>'."\r\n";
-                 }
+                </li>' . "\r\n";
+                    }
+                }
+                else{
+                    echo '<li class="list-group-item d-flex justify-content-between align-items-start">Actuellement Aucun partenaire inscrit</li>';
+                }
                  ?>
             </ol>  
         </div>

@@ -9,25 +9,10 @@ class Structures{
     private string $structure_name;
     private int $user_id;
     private int $partner_id = 0;
-    private bool $is_active;
+    private bool $structure_active;
+
 
     /**
-     * @return bool
-     */
-    public function getIsActive(): bool
-    {
-        return $this->is_active;
-    }
-
-    /**
-     * @param bool $is_active
-     */
-    public function setIsActive(bool $is_active): void
-    {
-        $this->is_active = $is_active;
-    }
-
-        /**
      * @return int
      */
     public function getStructureId(): int
@@ -91,13 +76,28 @@ class Structures{
         $this->partner_id = $partner_id;
     }
 
+    /**
+     * @return bool
+     */
+    public function getStructureActive(): bool
+    {
+        return $this->structure_active;
+    }
+
+    /**
+     * @param bool $structure_active
+     */
+    public function setStructureActive(bool $structure_active): void
+    {
+        $this->structure_active = $structure_active;
+    }
     /************************************************************/
     /*                      Fonction                            */
     /************************************************************/
 
 
     public function saveStructure(){
-        $query = 'UPDATE structures SET structure_name = :structure_name, user_id = :user_id, partner_id = :partner_id, is_active = :is_active WHERE structure_id = :structure_id';
+        $query = 'UPDATE structures SET structure_name = :structure_name, user_id = :user_id, partner_id = :partner_id, structure_active = :structure_active WHERE structure_id = :structure_id';
 
         try {
             Database::q($query, [
@@ -105,7 +105,7 @@ class Structures{
                 ':structure_name' => $this->structure_name,
                 ':user_id' => $this ->user_id,
                 ':partner_id' => $this->partner_id,
-                ':is_active' => ($this->is_active) ? 1 : 0,
+                ':structure_active' => ($this->structure_active) ? 1 : 0,
             ]);
         }
         catch (\Exception $e){
@@ -129,10 +129,10 @@ class Structures{
         return Database::lastInsertId();
     }
 
-    public function getStructure() : Structures{
+    public function getStructure(int $structure_id) : Structures{
         $query = 'Select * from structures where structure_id = :structure_id ';
         $structureList = Database::q($query, [
-                ':structure_id' => $this->structure_id
+                ':structure_id' => $structure_id
             ]
         );
         if ($structureList->rowCount() == 1){
@@ -152,10 +152,46 @@ class Structures{
             return $structure->fetch();
         }
         else{
-            return Structures();
+            return new Structures();
         }
     }
 
+    public function getStructureListByPartnerId(int $partner_id) : array{
+        $query = 'Select * from structures where partner_id = :partner_id ';
+        $structureList = Database::q($query, [':partner_id' => $partner_id]);
+        if ($structureList->rowCount() >= 1){
+            return array_column($structureList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\Structures'), null, 'user_id');
+        }
+        return array();
+    }
+
+
+    public function getStructureListByStructuresId(array $structureKey) : array
+    {
+        $query = 'Select * from structures WHERE structure_id IN ('.implode(', ', $structureKey).') ';
+        $partnerServicesList = Database::q($query);
+        if ($partnerServicesList->rowCount() >= 1){
+            return array_column($partnerServicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\Structures'), null, 'user_id');
+        }
+        return array();
+    }
+
+    public function searchB(string $search, int $page, $structure_active = null, $oderBy = null) : array{
+        $query = 'Select * from structures WHERE structure_name LIKE :structure_name'
+            . ((is_bool($structure_active)) ? ' and structure_active = :structure_active' : '')
+            . ' Limit :page, '.NUMBER_ITEM_PER_PAGE;
+        if(is_bool($structure_active)){
+            $param = [':structure_name' => "%$search%", ':page' => ($page*NUMBER_ITEM_PER_PAGE), ':structure_active' => (($structure_active) ? 1 : 0) ];
+        }
+        else{
+            $param = [':structure_name' => "%$search%", ':page' => ($page*NUMBER_ITEM_PER_PAGE) ];
+        }
+        $structuresList = Database::q($query, $param);
+        if ($structuresList->rowCount() >= 1){
+            return array_column($structuresList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\Structures'), null, 'user_id');
+        }
+        return array();
+    }
     /************************************************************/
     /*                 Fonction à amélioré                      */
     /************************************************************/
@@ -178,19 +214,19 @@ class Structures{
         return array();
     }
 
-    public function getStructureListByPartnerId(int $partner_id) : array{
+
+    /****************************************************/
+    /*                INUTILE MAINTENANT                */
+    /****************************************************/
+
+    /*public function getStructureListByPartnerId(int $partner_id) : array{
         $query = 'Select * from structures LEFT JOIN users ON structures.user_id = users.user_id where partner_id = :partner_id ';
         $structureList = Database::q($query, [':partner_id' => $partner_id]);
         if ($structureList->rowCount() >= 1){
             return $structureList->fetchAll(\PDO::FETCH_OBJ);
         }
         return array();
-    }
-
-
-    /****************************************************/
-    /*                INUTILE MAINTENANT                */
-    /****************************************************/
+    }*/
     public function updateStatusById(int $structure_id, int $is_active) : void{
         $query = 'UPDATE structures SET is_active = :is_active WHERE structure_id = :structure_id';
         Database::q($query, [':structure_id' => $structure_id, ':is_active' => (($is_active) ? 1 : 0)]);
@@ -202,8 +238,7 @@ class Structures{
         return Database::lastInsertId();
     }
 
-    public function getStructureByStructureId(int $structure_id)
-    {
+    public function getStructureByStructureId(int $structure_id){
         $structure = Database::q('SELECT * from structures WHERE structure_id = :structure_id', [':structure_id' => $structure_id]);
         if($structure->rowCount() == 1){
             $structure = $structure->fetch(\PDO::FETCH_OBJ);
@@ -213,6 +248,19 @@ class Structures{
             $this->user_id = $structure->user_id;
             $this->partner_id = $structure->partner_id;
             return $structure;
+        }
+    }
+
+    public function deleteStructure(int $structure_id) : bool {
+        $query = 'delete from structures where structure_id = :structure_id';
+        try{
+            Database::q($query , [
+                ':structure_id' => $structure_id
+            ]);
+            return true;
+        }
+        catch (\Exception $e){
+            return false;
         }
     }
 
