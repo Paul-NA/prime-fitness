@@ -63,8 +63,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button>
-                    <button  type="button" class="btn btn-warning btnEditPartner" data-bs-editpartner>Créer le partenaire</button>
-                    <button  type="submit" class="btn btn-success btnEditValid d-none">Confirmer le nouveau partenaire</button>
+                    <button  type="button" class="btn btn-warning btnEditPartner" data-bs-editpartner>Créer la structure</button>
+                    <button  type="submit" class="btn btn-success btnEditValid d-none">Confirmer la nouvelle structure</button>
                 </div>
             </form>
         </div>

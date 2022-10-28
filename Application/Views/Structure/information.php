@@ -19,7 +19,7 @@ include PATH_VIEW.'_header.php';
                     <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
                 </svg>
                 <div class="float-start">
-                    <h1 class="h6 mb-0 lh-1"><?php echo $this->cleanHTML($partner_info->getPartnerName());?></h1>
+                    <h1 class="h6 mb-0 lh-1"><?php echo $this->cleanHTML($structure_info->getStructureName());?></h1>
                     <small class="d-none d-sm-inline"">Information partenaire</small>
                 </div>
                 <?php
