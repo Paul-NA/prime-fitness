@@ -1,7 +1,7 @@
 <?php
 use Application\Core\Controller;
 use Application\Core\Helper;
-use Application\Models\User;
+use Application\Models\Users;
 use Application\Models\UserConfirmModel;
 use Application\Models\LogsModel;
 
@@ -10,11 +10,11 @@ use Application\Models\LogsModel;
  */
 class ControllerUser extends Controller
 {
-    private User $user;
+    private Users $user;
 
     public function __construct()
     {
-        $this->user = new User();
+        $this->user = new Users();
     }
 
     /**
@@ -49,7 +49,7 @@ class ControllerUser extends Controller
                 // TODO : a refaire j'aimerai utilisé un autre système
                 if($user_id > 0){
 
-                    $currentUser = new User();
+                    $currentUser = new Users();
                     // Récupération d'un utilisateur
                     $currentUser->getUser($user_id);
 
@@ -103,7 +103,7 @@ class ControllerUser extends Controller
             if($userConfirm->getUserId() > 0){
 
                 // On va récupérer l'utilisateur à traiter
-                $currentUser = new User();
+                $currentUser = new Users();
                 $currentUser->getUser($userConfirm->getUserId());
 
                 // On vérifie que les post "password-prime" et "password-prime-exist" existe

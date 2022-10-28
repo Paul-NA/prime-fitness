@@ -7,7 +7,7 @@ use Application\Models\PartnersServices;
 use Application\Models\Services;
 use Application\Models\Structures;
 use Application\Models\StructuresServices;
-use Application\Models\User;
+use Application\Models\Users;
 use Application\Models\UserConfirmModel;
 
 /**
@@ -17,7 +17,7 @@ use Application\Models\UserConfirmModel;
  */
 class ControllerForm extends ControllerSecuredAdmin {
 
-    private User $user;
+    private Users $user;
     private Partners $partner;
     private Structures $structure;
     private StructuresServices $structurerService;
@@ -31,7 +31,7 @@ class ControllerForm extends ControllerSecuredAdmin {
         $this->partnerService = new PartnersServices();
         $this->structurerService = new StructuresServices();
         $this->partner = new Partners();
-        $this->user = new User();
+        $this->user = new Users();
 
         $this->form_error = '';
         $this->form_success = '';
@@ -85,7 +85,7 @@ class ControllerForm extends ControllerSecuredAdmin {
             $err = [];
             $this->checkFormRegex('user_id', REGEX_USER_ID) ? '' : $err['UserId'] = 1;
             if(count($err) === 0){
-                $userPartner = new User();
+                $userPartner = new Users();
                 $delUser = $userPartner->getUserv2($this->request->getParameter('user_id'));
                 /**
                  * L'utilisateur existe
@@ -108,8 +108,8 @@ class ControllerForm extends ControllerSecuredAdmin {
                         $delUser->getUserMail();
                         if(count($userKey) >= 1) {
                             // Maintenant on va récupérer la liste des utilisateurs et leurs informations et les delete
-                            $users = new User();
-                            $usersList = $users->getUSerByUsersId($userKey);
+                            $users = new Users();
+                            $usersList = $users->getUserListByUsersId($userKey);
 
 
 
@@ -181,7 +181,7 @@ class ControllerForm extends ControllerSecuredAdmin {
             }
             else {
                 //creation de l'utilisateur et récupération de l'id
-                $newUser = new User();
+                $newUser = new Users();
                 $newUser->setUserFirstname($this->request->getParameter('inputFirstName'));
                 $newUser->setUserLastname($this->request->getParameter('inputLastName'));
                 $newUser->setUserMail($this->request->getParameter('inputEmail'));
@@ -265,10 +265,10 @@ class ControllerForm extends ControllerSecuredAdmin {
                     /**
                      * La structure existe donc l'utilisateur existe obligatoirement
                      */
-                    $updateUser = new User();
+                    $updateUser = new Users();
                     $updateUser->getUser($updateStructure->getUserId());
 
-                    $partenaireUser = new User();
+                    $partenaireUser = new Users();
                     $partenaireUser->getUser($updateStructure->getUserId()); //<-- foirage ici
 
 
@@ -420,7 +420,7 @@ class ControllerForm extends ControllerSecuredAdmin {
                 \Application\Core\Database::start_transaction();
                 try {
                     //creation de l'utilisateur et récupération de l'id
-                    $newUser = new User();
+                    $newUser = new Users();
                     $newUser->setUserFirstname($this->request->getParameter('inputFirstName'));
                     $newUser->setUserLastname($this->request->getParameter('inputLastName'));
                     $newUser->setUserMail($this->request->getParameter('inputEmail'));
@@ -513,7 +513,7 @@ class ControllerForm extends ControllerSecuredAdmin {
                     /**
                      * Le partenaire existe donc l'utilisateur existe obligatoirement
                      */
-                    $updateUser = new User();
+                    $updateUser = new Users();
                     $updateUser->getUser($updatePartner->getUserId());
 
                     // testons les différences du partenaire, le partenaire à un nom social (en général nom de la boite, et le status actif ou inactif)
@@ -698,7 +698,7 @@ class ControllerForm extends ControllerSecuredAdmin {
                 $partner = $this->partner->getPartnerByPartnerId($this->request->getParameter('service_type_id'));
 
                 // On retrouve l'utilisateur
-                $partnerUser = new User();
+                $partnerUser = new Users();
                 $partnerUser->getUser($partner->getUserId());
 
                 /**
@@ -731,8 +731,8 @@ class ControllerForm extends ControllerSecuredAdmin {
                         $userKey = array_keys($structuresEditList);
 
                         // on récupère les informations des utilisateurs concernés
-                        $userEdit = new User();
-                        $usersEditList = $userEdit->getUSerByUsersId($userKey);
+                        $userEdit = new Users();
+                        $usersEditList = $userEdit->getUserListByUsersId($userKey);
 
                         /** Étape suivante, on doit supprimer sur les structures la relation avec le service du partenaire */
                         if(count($structuresEditList) >= 1) {
@@ -782,21 +782,12 @@ class ControllerForm extends ControllerSecuredAdmin {
                         //Redirection vers le partenaire
                         $this->redirect('/partner/information/' . $this->request->getParameter('service_type_id'));
                     }
-                    else{
-                        $this->generateView(array('title' => 'Erreur : refusé', 'msgError' => 'Oups, ce partenaire possédè déjà ce service !'), 'error', 'error');
-                    }
+                    else{$this->generateView(array('title' => 'Erreur : refusé', 'msgError' => 'Oups, ce partenaire possédè déjà ce service !'), 'error', 'error');}
                 }
-
-                else{
-                    $this->generateView(array('title' => 'Erreur : Paramètre incorrect', 'msgError' => 'Oups, certain paramètre passer ne sont pas bon...'), 'error', 'error');
-                }
+                else{$this->generateView(array('title' => 'Erreur : Paramètre incorrect', 'msgError' => 'Oups, certain paramètre passer ne sont pas bon...'), 'error', 'error');}
             }
-            else{
-                $this->generateView(array('title' => 'Erreur : Paramètre incorrect', 'msgError' => 'Oups les paramètre passer ne sont pas correct...'), 'error', 'error');
-            }
+            else{$this->generateView(array('title' => 'Erreur : Paramètre incorrect', 'msgError' => 'Oups les paramètre passer ne sont pas correct...'), 'error', 'error');}
         }
-        else{
-            $this->generateView(array('title' => 'Csrf erreur', 'msgError' => 'Oups : il y à un petit problème avec le code CSRF ;)'), 'error', 'error');
-        }
+        else{$this->generateView(array('title' => 'Csrf erreur', 'msgError' => 'Oups : il y à un petit problème avec le code CSRF ;)'), 'error', 'error');}
     }
 }

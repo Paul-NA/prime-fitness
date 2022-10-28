@@ -6,7 +6,7 @@ use Application\Models\PartnersServices;
 use Application\Models\Services;
 use Application\Models\Structures;
 use Application\Models\StructuresServices;
-use Application\Models\User;
+use Application\Models\Users;
 
 /**
  * Contrôleur de la page Partenaire
@@ -25,7 +25,7 @@ class ControllerStructure extends ControllerSecured {
     public function information(){
         $session = $this->request->getSession();
 
-        $user = new User();
+        $user = new Users();
         $user->getUSer($session->getAttribute("user_id"));
 
         // on vérifie que l'on ait bien un id structure
@@ -42,7 +42,7 @@ class ControllerStructure extends ControllerSecured {
                 $partner = new Partners();
                 $partnerInst = $partner->getPartnerByPartnerId($structureInst->getPartnerId());
                 // User partner
-                $structureUser = new User();
+                $structureUser = new Users();
                 $structureUser->getUser($structureInst->getUserId());
 
                 // On doit vérifier si l'id de la structure existe sinon on redirigera vers la liste des partenaires

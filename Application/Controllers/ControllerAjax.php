@@ -3,7 +3,7 @@
 use Application\Core\ControllerSecuredAdmin;
 use Application\Models\Partners;
 use Application\Models\Structures;
-use Application\Models\User;
+use Application\Models\Users;
 
 /**
  * Contrôleur des requêtes en ajax pour administrateur uniquement
@@ -17,7 +17,7 @@ class ControllerAjax extends ControllerSecuredAdmin {
     public function __construct() {
         if(!empty($_SERVER['HTTP_SEARCH_HEADER']) && $_SERVER['HTTP_SEARCH_HEADER'] == 'AjaxSearchRequest' )
         {    
-            $this->users = new User();
+            $this->users = new Users();
             $this->partners = new Partners();
             $this->structures = new Structures();
         }
@@ -81,8 +81,8 @@ class ControllerAjax extends ControllerSecuredAdmin {
          * On récupère les clés sur la liste
          */
         $userKey = array_keys($listPartner);
-        $u = new User();
-        $userList = (count($userKey) > 0) ? $u->getUSerByUsersid($userKey) : [];
+        $u = new Users();
+        $userList = (count($userKey) > 0) ? $u->getUserListByUsersId($userKey) : [];
 
         $this->generateView(
             // paramètre à envoyé à la vue
@@ -113,8 +113,8 @@ class ControllerAjax extends ControllerSecuredAdmin {
          * On récupère les clés sur la liste
          */
         $userKey = array_keys($listStructures);
-        $u = new User();
-        $usersList = (count($userKey) > 0) ? $u->getUSerByUsersid($userKey) : [];
+        $u = new Users();
+        $usersList = (count($userKey) > 0) ? $u->getUserListByUsersId($userKey) : [];
 
         $this->generateView(
         // paramètre à envoyé à la vue

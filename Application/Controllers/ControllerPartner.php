@@ -4,17 +4,17 @@ use Application\Models\Partners;
 use Application\Models\PartnersServices;
 use Application\Models\Services;
 use Application\Models\Structures;
-use Application\Models\User;
+use Application\Models\Users;
 
 /**
  * Contrôleur de la page Partenaire
  */
 class ControllerPartner extends ControllerSecured {
 
-    private User $user;
+    private Users $user;
 
     public function __construct() {
-        $this->user = new User();
+        $this->user = new Users();
     }
     
     /**
@@ -28,7 +28,7 @@ class ControllerPartner extends ControllerSecured {
      */
     public function information(){
 
-        $currentUser = new User();
+        $currentUser = new Users();
         $currentUser->getUSer($this->request->getSession()->getAttribute("user_id"));
 
         // on vérifie que l'on ait bien un id partenaire
@@ -40,7 +40,7 @@ class ControllerPartner extends ControllerSecured {
             if($infosPartner->getPartnerId() > 0 &&(($currentUser->getRoleId() == ROLE_ADMIN) || ($currentUser->getRoleId() == ROLE_PARTNER && $currentUser->getUserId() == $infosPartner->getUSerId()))){
 
                 // User partner
-                $partnerUser = new User();
+                $partnerUser = new Users();
                 $partnerUser->getUser($infosPartner->getUserId());
 
                 // On doit vérifier si l'id de la structure existe sinon on redirigera vers la liste des partenaires
@@ -59,8 +59,8 @@ class ControllerPartner extends ControllerSecured {
                 $userKey = array_keys($structureList);
 
                 // Ici on va récupérer la liste des utilisateurs de chaque structure
-                $structureUser = new User();
-                $structureUserList = (count($userKey) >= 1) ? $structureUser->getUSerByUsersid($userKey) : [];
+                $structureUser = new Users();
+                $structureUserList = (count($userKey) >= 1) ? $structureUser->getUserListByUsersId($userKey) : [];
 
                 // On génère un csrf
                 $this->genCsrf();
@@ -120,8 +120,8 @@ class ControllerPartner extends ControllerSecured {
                  */
                 $userKey = array_keys($listPartner);
 
-                $u = new User();
-                $userList = (count($userKey) > 0) ? $u->getUSerByUsersid($userKey) : [];
+                $u = new Users();
+                $userList = (count($userKey) > 0) ? $u->getUserListByUsersId($userKey) : [];
 
                 if($page+1 <= $totalPage || $partner->getTotalPartner() == 0) {
                     $this->generateView(

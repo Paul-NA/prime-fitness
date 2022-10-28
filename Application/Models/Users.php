@@ -3,7 +3,7 @@ namespace Application\Models;
 
 use Application\Core\Database;
 
-class User{
+class Users{
 
     /**
      * @var int Identifiant de l'utilisateur
@@ -215,17 +215,17 @@ class User{
     }
 
 
-    public function getUserv2(int $user_id) : User{
+    public function getUserv2(int $user_id) : Users{
         $query = 'Select * from users where user_id = :user_id ';
         $user = Database::q($query, [
                 ':user_id' => $user_id
             ]
         );
         if ($user->rowCount() == 1){
-            $user->setFetchMode(\PDO::FETCH_CLASS, 'Application\Models\User');
+            $user->setFetchMode(\PDO::FETCH_CLASS, 'Application\Models\Users');
             return $user->fetch();
         }
-        return new User();
+        return new Users();
     }
 
     /**
@@ -257,12 +257,12 @@ class User{
         }
     }
 
-    public function getUSerByUsersId(array $userIdList) : array{
+    public function getUserListByUsersId(array $userIdList) : array{
         $query = 'Select * from users WHERE user_id IN ('.implode(', ', $userIdList).') ';
         $partnerServicesList = Database::q($query);
         //$partnerServicesList = Database::q($query, [':list_id' => implode($userIdList)]);
         if ($partnerServicesList->rowCount() >= 1){
-            return array_column($partnerServicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\User'), null, 'user_id');
+            return array_column($partnerServicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\Users'), null, 'user_id');
         }
         return array();
     }
@@ -353,8 +353,6 @@ class User{
             return true;
         }
         catch (\Exception $e){
-            var_dump($e);
-            die();
             return false;
         }
     }
