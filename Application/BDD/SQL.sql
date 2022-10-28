@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS partners_services (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Structure de la table `partner`
--- avec la FK sur le users et services
+-- avec la FK sur le users et partners
 CREATE TABLE IF NOT EXISTS structures (
   structure_id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   structure_name varchar(90) NOT NULL,
@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS structures_services (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Structure de la table `logs`
+-- avec la FK sur le structures et users
 CREATE TABLE IF NOT EXISTS logs (
   log_id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   log_type enum('users','partners','partners_services','structures','structures_services') NOT NULL,
