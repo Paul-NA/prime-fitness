@@ -10,7 +10,7 @@
 ## Table des matières
 - [Fichier Annexe](#fichier-annexe)
 - [Lien](#lien)
-- [Conditions requises d'utilisation](#exigences)
+- [Conditions requises d'utilisation](#condition-requise-dutilisation)
 - [Récupération du projet](#recuperation-du-projet)
 - [Installation](#installation)
 - [Création de la base de données](#creation-de-la-base-de-donnes)
@@ -39,7 +39,7 @@ Voici les liens a visité en complement
 
  ***
 
-# Condition requires d'utilisation
+# Condition requise d'utilisation
 * PHP 7.4 ou supérieur
 * Apache ou Nginx
 * MySql ou MariaDB
