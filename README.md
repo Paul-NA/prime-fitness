@@ -119,7 +119,7 @@ Mot de passe admin par défaut : E54Ffzyr!re
 
 # Tester le projet en ligne
 
-rendez vous à l'addresse : https://prime-fitness.com
+rendez vous à l'addresse : https://prime-fitness.site
 
 ```
 login admin et mot de passe par défaut identique que precedement
