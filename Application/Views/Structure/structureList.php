@@ -1,4 +1,7 @@
-
+<?php
+//Simple vérification que l'on n'accède pas à ce fichier directement depuis le navigateur
+if(!defined('URI_ROOT')) die('heu non désolé :)');
+?>
             <ol class="list-group">
                 <?php
                 if(!empty($structures_list) && count($structures_list) >= 1) {

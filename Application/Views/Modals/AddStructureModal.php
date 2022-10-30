@@ -1,4 +1,7 @@
-
+<?php
+//Simple vérification que l'on n'accède pas à ce fichier directement depuis le navigateur
+if(!defined('URI_ROOT')) die('heu non désolé :)');
+?>
 <!-- Modale Activation/désactivtion des structures -->
 <div class="modal fade" id="AddNewStructure" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">

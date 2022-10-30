@@ -1,4 +1,7 @@
 <?php
+//Simple vérification que l'on n'accède pas à ce fichier directement depuis le navigateur
+if(!defined('URI_ROOT')) die('heu non désolé :)');
+
 /**
  * Ici on doit afficher la liste des services sur la page partenaire et sur la page structure
  */

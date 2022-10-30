@@ -1,4 +1,6 @@
 <?php
+//Simple vérification que l'on n'accède pas à ce fichier directement depuis le navigateur
+if(!defined('URI_ROOT')) die('heu non désolé :)');
 $this->titre = "Prime-Fitness - Confirmez votre compte en changeant votre mot de passe";
 ?>
 <main class="form-signin text-center">

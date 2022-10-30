@@ -1,4 +1,7 @@
 <?php
+//Simple vérification que l'on n'accède pas à ce fichier directement depuis le navigateur
+if(!defined('URI_ROOT')) die('heu non désolé :)');
+
 $this->titre = (!empty($title)) ? $title : 'Error indefined';
 ?>
 <div class="modal modal-lg modal-alert position-static d-block py-5" tabindex="-1" role="dialog" id="modalChoice">

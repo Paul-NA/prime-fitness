@@ -1,4 +1,6 @@
 <?php
+//Simple vérification que l'on n'accède pas à ce fichier directement depuis le navigateur
+if(!defined('URI_ROOT')) die('heu non désolé :)');
 
 $this->titre = 'Prime-Fitness - '. $this->cleanHTML($partner_info->getPartnerName()) . ' information';
 
@@ -26,13 +28,13 @@ if(!empty($user_partner_info)) :
                 <?php
                 if($user_info->getRoleId() == ROLE_ADMIN) :?>
 
-                    <button type="button" class="btn btn-danger display-inline float-end mx-1" style="float: right;"
+                <button type="button" class="btn btn-danger display-inline float-end mx-1" style="float: right;"
                             data-bs-toggle="modal"
                             data-bs-target="#DeleteUser"
                             data-bs-csrf="<?php echo $csrf_token?>"
                             data-bs-userId="<?php echo $partner_info->getUserId();?>">
                         <i class="bi bi-x-square"></i><span class="d-none d-sm-inline"> Supprimer</span>
-                    </button>
+                </button>
                 <button type="button" class="btn btn-primary display-inline  float-end" style="float: right;"
                         data-bs-toggle="modal"
                         data-bs-target="#EditPartner"
@@ -54,13 +56,13 @@ if(!empty($user_partner_info)) :
             <?php
             if(!empty($form_error)){
                 echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-square-fill"></i> <strong>Une erreur est survenue!</strong>  '.$_SESSION['form_error'].' 
+                <i class="bi bi-exclamation-square-fill"></i> <strong>Une erreur est survenue!</strong>  '.$form_error.' 
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>';
             }
             if(!empty($form_success)){
                 echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-square-fill"></i> '.$_SESSION['form_success'].' 
+                <i class="bi bi-exclamation-square-fill"></i> '.$form_success   .' 
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>';
             }

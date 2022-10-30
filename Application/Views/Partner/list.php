@@ -1,4 +1,7 @@
 <?php
+//Simple vérification que l'on n'accède pas à ce fichier directement depuis le navigateur
+if(!defined('URI_ROOT')) die('heu non désolé :)');
+
 $this->titre = "Liste des partenaires";
 array_push($this->jsFiles, URI_ROOT.'/Assets/Javascript/application.js');
 

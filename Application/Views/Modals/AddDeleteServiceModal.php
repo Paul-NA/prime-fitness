@@ -1,4 +1,7 @@
-
+<?php
+//Simple vérification que l'on n'accède pas à ce fichier directement depuis le navigateur
+if(!defined('URI_ROOT')) die('heu non désolé :)');
+?>
 <!-- Modale Activation/désactivation des services -->
 <div class="modal fade modal-lg" id="AddRemoveService" tabindex="-1" aria-labelledby="AddDeleteServiceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
