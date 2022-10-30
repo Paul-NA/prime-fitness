@@ -4,7 +4,6 @@ $this->titre = 'Prime-Fitness - '. $this->cleanHTML($partner_info->getPartnerNam
 
 array_push($this->jsFiles, URI_ROOT.'/Assets/Javascript/application.js');
 
-$this->cssFiles = ['https://getbootstrap.com/docs/5.2/examples/offcanvas-navbar/offcanvas.css'];
 
 include PATH_VIEW.'_header.php';
 
