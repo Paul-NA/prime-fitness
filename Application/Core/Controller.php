@@ -126,14 +126,18 @@ abstract class Controller
         ($this->request->getSession()->existAttribute('flash_error')) ?? $this->request->getSession()->deleteAttribute('flash_success');
     }
     public function isAdmin() : bool{
+        //var_dump($this->user);
+        //return $this->isLogged() && $this->user->getRoleId() == ROLE_ADMIN;
         return $this->isLogged() && $this->request->getSession()->getAttribute('user_role') == ROLE_ADMIN;
     }
 
     public function isPartner() : bool{
+        //return $this->isLogged() && $this->user->getRoleId() == ROLE_PARTNER;
         return $this->isLogged() && $this->request->getSession()->getAttribute('user_role') == ROLE_PARTNER;
     }
 
     public function isStructure() : bool{
+        //return $this->isLogged() && $this->user->getRoleId() == ROLE_STRUCTURE
         return $this->isLogged() && $this->request->getSession()->getAttribute('user_role') == ROLE_STRUCTURE;
     }
 
