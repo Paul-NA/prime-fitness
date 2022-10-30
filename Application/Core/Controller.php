@@ -1,12 +1,19 @@
 <?php
 namespace Application\Core;
 
+use Application\Models\Users;
+
 /**
  * Classe abstraite contrôleur. 
  * Fournit des services communs aux classes contrôleurs dérivées.
  */
 abstract class Controller
 {
+    /**
+     * Utilisateur courant
+     */
+    private Users $user;
+
     /**
      * Action à réaliser
      */
@@ -61,6 +68,19 @@ abstract class Controller
         // Utilisation du nom du contrôleur actuel
         $classeController = ($changeController === null ) ? get_class($this) : $changeController;
         $controllerView = str_replace("Controller", "", $classeController);
+
+        // on ajoute l'utilisateur aux données de la vue s'il est connecté
+        if($this->isLogged()){
+            $user = new Users();
+            $this->user = $user->getUserv2($this->request->getSession()->getAttribute("user_id"));
+            // vérifie que l'utilisateur est bien réel, et que l'utilisateur est actif
+            if($this->user->getUserId() > 0 && $this->user->isUserActive()) {
+                $donneesVue['current_user'] = $this->user;
+            }
+            else{
+                $this->redirect('/user/logout');
+            }
+        }
 
         // Instanciation et génération de la vue
         $vue = new View($actionVue, $controllerView);
