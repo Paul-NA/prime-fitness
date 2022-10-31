@@ -152,10 +152,8 @@ class ControllerForm extends ControllerSecuredAdmin {
             $this->checkFormRegex('inputSocialName', REGEX_SOCIAL_NAME) ? '' : $err['SocialName'] = 1;
             $this->checkFormRegex('inputAddress', REGEX_ADDRESS) ? '' : $err['Address'] = 1;
             $this->checkFormRegex('partner_id', REGEX_PARTNER_ID) ? '' : $err['partner_id'] = 1;
-            if(count($err)> 0){
-                $this->generateView(array('title' => 'Erreur', 'msgError' => 'Désolé il y a une erreur dans le formulaire !'), 'error', 'error');
-            }
-            else {
+            if(count($err) === 0){
+
                 $_partner = new Partner();
                 $partner = $_partner->getPartnerByPartnerId($this->request->getParameter('partner_id'));
 
@@ -216,6 +214,9 @@ class ControllerForm extends ControllerSecuredAdmin {
                 else{
                     $this->generateView(array('title' => 'Erreur', 'msgError' => 'Oups : le partenaire n\'existe pas !'), 'error', 'error');
                 }
+            }
+            else {
+                $this->generateView(array('title' => 'Erreur', 'msgError' => 'Désolé il y a une erreur dans le formulaire !'), 'error', 'error');
             }
         }
         else{
