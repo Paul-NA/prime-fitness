@@ -6,20 +6,19 @@ if(!defined('URI_ROOT')) die('heu non désolé :)');
  * Ici on doit afficher la liste des services sur la page partenaire et sur la page structure
  */
 // on doit séparer les services en 2 liste pour le visuel, on va donc faire un petit système pour check par modulo
-if(!empty($services_list) && !empty($user_info) && !empty($csrf_token) ){
+if(!empty($services_list) && !empty($current_user) && !empty($csrf_token) ){
     $i = 0;
     $listA = '';
     $listB = '';
-    //var_dump($services_list);
-    //  var_dump($partner_services);
     foreach($services_list as $service){
+
         $service_partner = (!empty($partner_services) && array_key_exists($service->getServiceID() , $partner_services)) ? $partner_services[$service->getServiceId()] : null;
 
         $text = '
                             <li class="list-group-item d-flex justify-content-between align-items-start fw-semibold " >
                                 <div class="float-start">'.$this->cleanHTML($service->getServiceName()).'</div>
                                 <div class="justify-content-end">'
-                                    .(($user_info->getRoleId() == ROLE_ADMIN)
+                                    .(($current_user->getRoleId() == ROLE_ADMIN)
                                         ? // On est admin, on peut voir les boutons admin sinon simple affichage
                                             (($service_partner != null)
                                                 // le service est installé

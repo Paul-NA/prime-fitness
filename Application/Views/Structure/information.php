@@ -6,8 +6,8 @@ $this->titre = 'Prime-Fitness - '. $this->cleanHTML($structure_info->getStructur
 /**
  * Cette page require un fichier Css personnel
  */
-
-array_push($this->jsFiles, URI_ROOT.'/Assets/Javascript/application.js');
+if($current_user->getRoleId() == ROLE_ADMIN)
+    array_push($this->jsFiles, URI_ROOT.'/Assets/Javascript/application.js');
 
 include PATH_VIEW.'_header.php';
 ?>
@@ -25,7 +25,7 @@ include PATH_VIEW.'_header.php';
                     <small class="d-none d-sm-inline"">Information partenaire</small>
                 </div>
                 <?php
-                if($user_info->getRoleId() == ROLE_ADMIN) :?>
+                if($current_user->getRoleId() == ROLE_ADMIN) :?>
                     <button type="button" class="btn btn-danger display-inline float-end mx-1" style="float: right;"
                             data-bs-toggle="modal"
                             data-bs-target="#DeleteUser"
@@ -124,7 +124,7 @@ include PATH_VIEW.'_header.php';
 /**
  * On charge le modèle utilisé pour afficher la liste des services de la structure
  */
-if($user_info->getRoleId() == ROLE_ADMIN) {
+if($current_user->getRoleId() == ROLE_ADMIN) {
     include PATH_VIEW . 'Modals/SearchModal.php';
     include PATH_VIEW . 'Modals/EnableDisableServiceModal.php';
     include PATH_VIEW . 'Modals/EnableDisableStructureModal.php';

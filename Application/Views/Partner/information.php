@@ -26,7 +26,7 @@ if(!empty($user_partner_info)) :
                     <small class="d-none d-sm-inline"">Information partenaire</small>
                 </div>
                 <?php
-                if($user_info->getRoleId() == ROLE_ADMIN) :?>
+                if($current_user->getRoleId() == ROLE_ADMIN) :?>
 
                 <button type="button" class="btn btn-danger display-inline float-end mx-1" style="float: right;"
                             data-bs-toggle="modal"
@@ -126,7 +126,7 @@ if(!empty($user_partner_info)) :
                     <small> Voici la liste de vos structures</small>
                 </div>
                 <?php
-                if($user_info->getRoleId() == ROLE_ADMIN) :?>
+                if($current_user->getRoleId() == ROLE_ADMIN) :?>
                     <button type="button" class="btn btn-primary display-inline  float-end" style="float: right;"
                             data-bs-toggle="modal"
                             data-bs-target="#AddNewStructure"
@@ -154,7 +154,7 @@ if(!empty($user_partner_info)) :
 /**
  * Inclusion de chaque modal nécessaire seulement pour les administrateurs
  */
-if($user_info->getRoleId() == ROLE_ADMIN) {
+if($current_user->getRoleId() == ROLE_ADMIN) {
     include PATH_VIEW . 'Modals/SearchModal.php';
     include PATH_VIEW . 'Modals/EnableDisableStructureModal.php';
     include PATH_VIEW . 'Modals/EnableDisableServiceModal.php';

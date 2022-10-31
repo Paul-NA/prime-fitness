@@ -3,7 +3,7 @@ namespace Application\Models;
 
 use Application\Core\Database;
 
-class Users{
+class User{
 
     /**
      * @var int Identifiant de l'utilisateur
@@ -196,6 +196,9 @@ class Users{
         $this->role_id = $role_id;
     }
 
+    /*****************************************************/
+    /*               liste des fonctions                 */
+    /*****************************************************/
 
     /**
      * Vérifie qu'un utilisateur existe dans la BD
@@ -214,55 +217,35 @@ class Users{
         return 0;
     }
 
-
-    public function getUserv2(int $user_id) : Users{
+    /**
+     * Retourne un utilisateur en fonction de l'user_id
+     * @param int $user_id
+     * @return User
+     */
+    public function getUser(int $user_id) : User{
         $query = 'Select * from users where user_id = :user_id ';
         $user = Database::q($query, [
                 ':user_id' => $user_id
             ]
         );
         if ($user->rowCount() == 1){
-            $user->setFetchMode(\PDO::FETCH_CLASS, 'Application\Models\Users');
+            $user->setFetchMode(\PDO::FETCH_CLASS, 'Application\Models\User');
             return $user->fetch();
         }
-        return new Users();
+        return new User();
     }
 
     /**
-     * Renvoie un utilisateur existant dans la BD
-     * 
-     * @param string $mail Le mail de l'utilisateur / admin
-     * @param string $password Le mot de passe de l'utilisateur / admin
-     * @return mixed L'utilisateur
-     * @throws Exception Si aucun utilisateur ne correspond aux paramètres
+     * Retourne une liste d'utilisateurs
+     * @param array $userIdList
+     * @return array
      */
-    public function getUser(int $user_id) : object{
-        $sql = "select user_id, user_mail, user_password, user_active, user_firstname, user_lastname, user_phone, user_address, role_id from users where user_id=:user_id";
-        $utilisateur =  Database::q($sql, [':user_id' => $user_id]);
-        if ($utilisateur->rowCount() == 1){
-            $user = $utilisateur->fetch(\PDO::FETCH_OBJ);
-            $this->user_id = $user->user_id;
-            $this->user_firstname = $user->user_firstname;
-            $this->user_lastname = $user->user_lastname;
-            $this->user_mail = $user->user_mail;
-            $this->user_password = $user->user_password;
-            $this->user_phone = $user->user_phone;
-            $this->user_address = $user->user_address;
-            $this->user_active = $user->user_active;
-            $this->role_id = $user->role_id;
-            return $user;
-        }
-        else{
-            throw new \Exception("Aucun utilisateur ne correspond aux identifiants fournis");
-        }
-    }
-
     public function getUserListByUsersId(array $userIdList) : array{
         $query = 'Select * from users WHERE user_id IN ('.implode(', ', $userIdList).') ';
         $partnerServicesList = Database::q($query);
         //$partnerServicesList = Database::q($query, [':list_id' => implode($userIdList)]);
         if ($partnerServicesList->rowCount() >= 1){
-            return array_column($partnerServicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\Users'), null, 'user_id');
+            return array_column($partnerServicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\User'), null, 'user_id');
         }
         return array();
     }
@@ -298,7 +281,7 @@ class Users{
      * Mise à jour d'un utilisateur dans la base de donnée
      * @return bool|void
      */
-    public function updateUser() {
+    public function updateUser() : bool {
         $query = 'UPDATE users SET 
                  user_firstname = :user_firstname, 
                  user_lastname = :user_lastname, 
@@ -330,6 +313,7 @@ class Users{
 
 
     /**
+     * Suppression d'un utilisateur
      * @param int $user_id
      * @return bool
      */
@@ -346,6 +330,11 @@ class Users{
         }
     }
 
+    /**
+     * Suppression de plusieurs utilisateurs avec une liste d'user_id
+     * @param array $users_id_list
+     * @return bool
+     */
     public function deleteUsersList(array $users_id_list) : bool{
         $query = 'delete from users where user_id IN ('.implode(', ', $users_id_list).')';
         try{
@@ -356,4 +345,5 @@ class Users{
             return false;
         }
     }
+
 }

@@ -2,13 +2,13 @@
 
 use Application\Core\ControllerSecuredAdmin;
 use Application\Core\Helper;
-use Application\Models\Partners;
-use Application\Models\PartnersServices;
-use Application\Models\Services;
-use Application\Models\Structures;
-use Application\Models\StructuresServices;
-use Application\Models\Users;
-use Application\Models\UserConfirmModel;
+use Application\Models\Partner;
+use Application\Models\PartnerService;
+use Application\Models\Service;
+use Application\Models\Structure;
+use Application\Models\StructureService;
+use Application\Models\User;
+use Application\Models\UserConfirm;
 
 /**
  * ControllerForm, il est uniquement accessible à la personne aillant un status Admin
@@ -17,21 +17,21 @@ use Application\Models\UserConfirmModel;
  */
 class ControllerForm extends ControllerSecuredAdmin {
 
-    private Users $user;
-    private Partners $partner;
-    private Structures $structure;
-    private StructuresServices $structurerService;
-    private PartnersServices $partnerService;
+    //private Users $user;
+    private Partner $partner;
+    private Structure $structure;
+    private StructureService $structurerService;
+    private PartnerService $partnerService;
 
     private string $form_error;
     private string $form_success;
 
     public function __construct() {
-        $this->structure = new Structures();
-        $this->partnerService = new PartnersServices();
-        $this->structurerService = new StructuresServices();
-        $this->partner = new Partners();
-        $this->user = new Users();
+        $this->structure = new Structure();
+        $this->partnerService = new PartnerService();
+        $this->structurerService = new StructureService();
+        $this->partner = new Partner();
+        $this->user = new User();
 
         $this->form_error = '';
         $this->form_success = '';
@@ -41,26 +41,6 @@ class ControllerForm extends ControllerSecuredAdmin {
      * Page /form (redirection)
      */
     public function index() {$this->redirect('/');}
-
-    /**
-     * Permet de faire certain test plus simplement sur les formulaires soumis en faisant des tests générique
-     */
-    /*public function checkForm(string $parameter, $type, $valueMinLength = null, $valueMaxLength = null) : bool{
-        if($type === 'strlen') {
-            return $this->request->existParameter($parameter) && strlen($this->request->getParameter($parameter)) >= $valueMinLength && (!($valueMaxLength !== null) || strlen($this->request->getParameter($parameter)) <= $valueMaxLength);
-        }
-        else if($type === 'is_numeric') {
-            return $this->request->existParameter($parameter) && is_numeric($this->request->getParameter($parameter)) && (!($valueMinLength !== null) || strlen($this->request->getParameter($parameter)) >= $valueMinLength) && (!($valueMaxLength !== null) || strlen($this->request->getParameter($parameter)) <= $valueMaxLength);
-        }
-        else if($type === 'mail') {
-            return $this->request->existParameter($parameter) && Helper::validMail($this->request->getParameter($parameter));
-        }
-        else if($type === 'bool'){
-            return $this->request->existParameter($parameter) && ($this->request->getParameter($parameter) == 0 || $this->request->getParameter($parameter) == 1);
-        }
-        else
-            return false;
-    }*/
 
     /**
      * Fonction permettant de vérifier si une chaine passer en paramètre de la requête et de validé si elle est valide à une regex précise
@@ -85,8 +65,8 @@ class ControllerForm extends ControllerSecuredAdmin {
             $err = [];
             $this->checkFormRegex('user_id', REGEX_USER_ID) ? '' : $err['UserId'] = 1;
             if(count($err) === 0){
-                $userPartner = new Users();
-                $delUser = $userPartner->getUserv2($this->request->getParameter('user_id'));
+                $userPartner = new User();
+                $delUser = $userPartner->getUser($this->request->getParameter('user_id'));
                 /**
                  * L'utilisateur existe
                  */
@@ -95,11 +75,11 @@ class ControllerForm extends ControllerSecuredAdmin {
                      * L'utilisateur est un partenaire
                      */
                     if ($delUser->getRoleId() == ROLE_PARTNER) {
-                        $partner = new Partners();
-                        $partnerInfo = $partner->getPartnerByUserIdv2($delUser->getUserId());
+                        $partner = new Partner();
+                        $partnerInfo = $partner->getPartnerByUserId($delUser->getUserId());
 
                         //On va rechercher les structure lier afin de récupérer tous les utilisateurs associer
-                        $structures = new Structures();
+                        $structures = new Structure();
                         $structuresList = $structures->getStructureListByPartnerId($partnerInfo->getPartnerId());
                         $userKey = array_keys($structuresList);
 
@@ -108,7 +88,7 @@ class ControllerForm extends ControllerSecuredAdmin {
                         $delUser->getUserMail();
                         if(count($userKey) >= 1) {
                             // Maintenant on va récupérer la liste des utilisateurs et leurs informations et les delete
-                            $users = new Users();
+                            $users = new User();
                             $usersList = $users->getUserListByUsersId($userKey);
 
 
@@ -120,16 +100,13 @@ class ControllerForm extends ControllerSecuredAdmin {
                             }
                         }
 
-                        /*var_dump($listEmail);
-                        die();*/
-                        // On supprime toutes les structures apparentées au partenaire et par conséquent tout leur contenue grace au FK delete on cascade
-                        //var_dump($userKey);die();
                         if($delUser->deleteUsersList($userKey)){
 
                         }
                         else{
                             die('erreur');
                         }
+
                         // On supprime le partenaire par la suite
                         $delUser->deleteUser($delUser->getUserId());
 
@@ -181,7 +158,7 @@ class ControllerForm extends ControllerSecuredAdmin {
             }
             else {
                 //creation de l'utilisateur et récupération de l'id
-                $newUser = new Users();
+                $newUser = new User();
                 $newUser->setUserFirstname($this->request->getParameter('inputFirstName'));
                 $newUser->setUserLastname($this->request->getParameter('inputLastName'));
                 $newUser->setUserMail($this->request->getParameter('inputEmail'));
@@ -193,20 +170,20 @@ class ControllerForm extends ControllerSecuredAdmin {
 
                 $confirmKey = md5(bin2hex(random_bytes(32)));
                 // Création du lien pour que l'utilisateur valide son compte
-                $user_confirm = new UserConfirmModel();
+                $user_confirm = new UserConfirm();
                 $user_confirm->setUserId($user_id);
                 $user_confirm->setUserKey($confirmKey);
                 $user_confirm->addUserConfirm();
 
                 //Ajout d'une nouvelle structure
-                $structure = new Structures();
+                $structure = new Structure();
                 $structure->setPartnerId($this->request->getParameter('partner_id'));
                 $structure->setUserId($user_id);
                 $structure->setStructureName($this->request->getParameter('inputSocialName'));
                 $id_structure = $structure->addStructure(); // Retourne le LastInsertId()
 
 
-                $partnerService = new PartnersServices();
+                $partnerService = new PartnerService();
                 $listPartnerServices  = $partnerService->getPartnerServiceListByPartnerId($this->request->getParameter('partner_id'));
 
                 /**
@@ -214,7 +191,7 @@ class ControllerForm extends ControllerSecuredAdmin {
                  */
                 foreach ($listPartnerServices as $partner_Service){
                     if($partner_Service->getPartnerServiceActive()) {
-                        $structureService = new StructuresServices();
+                        $structureService = new StructureService();
                         $structureService->setStructureId($id_structure);
                         $structureService->setPartnerServiceId($partner_Service->getPartnerServiceId());
                         $structureService->addStructureService();
@@ -258,18 +235,18 @@ class ControllerForm extends ControllerSecuredAdmin {
                 /**
                  * On doit vérifier que le partenaire existe
                  */
-                $structure = new Structures();
+                $structure = new Structure();
                 $updateStructure = $structure->getStructure($this->request->getParameter('inputStructureId'));
 
                 if($updateStructure->getStructureId() > 0) {
                     /**
                      * La structure existe donc l'utilisateur existe obligatoirement
                      */
-                    $updateUser = new Users();
-                    $updateUser->getUser($updateStructure->getUserId());
+                    $_user = new User();
+                    $updateUser = $_user->getUser($updateStructure->getUserId());
 
-                    $partenaireUser = new Users();
-                    $partenaireUser->getUser($updateStructure->getUserId()); //<-- foirage ici
+                    $user2 = new User();
+                    $partenaireUser = $user2->getUser($updateStructure->getUserId()); //<-- foirage ici
 
 
                     // testons les différences du partenaire, le partenaire à un nom social (en général nom de la boite, et le status actif ou inactif)
@@ -361,7 +338,7 @@ class ControllerForm extends ControllerSecuredAdmin {
             //$this->checkForm('is_active', 'is_numeric', 0 , 1) ? '': $err['is_active'] = true;
             //$this->checkForm('structure_id', 'is_numeric') ? '': $err['structure_id'] = true;
             if(count($err) == 0) {
-                $structure = new Structures();
+                $structure = new Structure();
                 //$structure->setStructureId($this->request->getParameter('structure_id'));
 
                 // on récupère les informations de la structure actuelle
@@ -420,7 +397,7 @@ class ControllerForm extends ControllerSecuredAdmin {
                 \Application\Core\Database::start_transaction();
                 try {
                     //creation de l'utilisateur et récupération de l'id
-                    $newUser = new Users();
+                    $newUser = new User();
                     $newUser->setUserFirstname($this->request->getParameter('inputFirstName'));
                     $newUser->setUserLastname($this->request->getParameter('inputLastName'));
                     $newUser->setUserMail($this->request->getParameter('inputEmail'));
@@ -439,14 +416,17 @@ class ControllerForm extends ControllerSecuredAdmin {
                         $this->form_error .= 'L\'utilisateur n\'a pas été mis à jour !<br />';
                     }
 
-                    $partner_id = $this->partner->createPartner($this->request->getParameter('inputSocialName'), $user_id);
+                    $partner = new Partner();
+                    $partner->setPartnerName($this->request->getParameter('inputSocialName'));
+                    $partner->setUserId($user_id);
+                    $partner_id = $partner->addPartner();
                     if($partner_id > 0){
 
                         $updatedUser = true;
                     }
                     $confirm_hash = md5(bin2hex(random_bytes(32)));
 
-                    $user_confirm = new UserConfirmModel();
+                    $user_confirm = new UserConfirm();
                     $user_confirm->setUserId($user_id);
                     $user_confirm->setUserKey($confirm_hash);
                     $user_confirm->addUserConfirm();
@@ -503,7 +483,7 @@ class ControllerForm extends ControllerSecuredAdmin {
                 /**
                  * On doit vérifier que le partenaire existe
                  */
-                $_updatePartner = new Partners();
+                $_updatePartner = new Partner();
                 $updatePartner = $_updatePartner->getPartnerByPartnerId($this->request->getParameter('inputPartnerId'));
 
                 if($updatePartner->getPartnerId() > 0) {
@@ -513,8 +493,8 @@ class ControllerForm extends ControllerSecuredAdmin {
                     /**
                      * Le partenaire existe donc l'utilisateur existe obligatoirement
                      */
-                    $updateUser = new Users();
-                    $updateUser->getUser($updatePartner->getUserId());
+                    $_user = new User();
+                    $updateUser = $_user->getUser($updatePartner->getUserId());
 
                     // testons les différences du partenaire, le partenaire à un nom social (en général nom de la boite, et le status actif ou inactif)
                     if($updatePartner->getPartnerName() != $this->request->getParameter('inputSocialName')  || // nom de l'entreprise
@@ -590,20 +570,50 @@ class ControllerForm extends ControllerSecuredAdmin {
     public function enableDisablePartner()
     {
         if($this->request->existParameter('partner_id') && $this->request->existParameter('partner_active') ){
-            $this->partner->updateStatusById($this->request->getParameter('partner_id'), $this->request->getParameter('partner_active'));
-            // on mail le partenaire
-            //Helper::sendMail($mailDest, $message, $object);
 
-            // vu que l'on doit désactiver les structures si les partenaires sont désactivé fesons le ici
-            $structureList = $this->structure->getStructureListByPartnerId($this->request->getParameter('partner_id'));
+            $partner = new Partner();
+            $partnerUpdate = $partner->getPartnerByPartnerId($this->request->getParameter('partner_id'));
 
-            // personnellement je ne désactiverais pas les structures, car pour la simple raison que si on doit réactiver le partenaire,
-            // on devrait réactiver les structure sans savoir s'il y en avait des désactivés ou non
-            foreach ($structureList as $structure){
-                //envoie de mail à chaque structure pour prévenir de la désactivation du partenaire et donc de sa structure par affiliation
-                //$this->structure->updateStatusById($structure->structure_id, $this->request->getParameter('partner_active'));
-                //Helper::sendMail($structure->user_mail, $message, $object);
+            if($partnerUpdate->getPartnerId() > 0){
+
+                $partnerUpdate->setPartnerActive($this->request->getParameter('partner_active'));
+                $partnerUpdate->partnerSave();
+
+                // vu que l'on doit désactiver les structures si les partenaires sont désactivé fesons le ici
+                $structures = new Structure();
+                $structureList = $structures->getStructureListByPartnerId($this->request->getParameter('partner_id'));
+
+                $maiList = [];
+
+                $userKey = array_keys($structureList);
+                if(count($userKey) >= 1){
+                    // on récupère les informations des utilisateurs concernés
+                    $users = new User();
+                    $usersList = $users->getUserListByUsersId($userKey);
+                    // personnellement je ne désactiverais pas les structures, car pour la simple raison que si on doit réactiver le partenaire,
+                    foreach ($structureList as $structure){
+
+                        // On ne désactive pas les structures, ainsi si le partenaire retrouve son compte il retrouve ses structures (en cas de paiement en retard par exemple)
+                        //$structure->setStructureActive($this->request->getParameter('partner_active'));
+
+                        //Envoi de mail à chaque structure pour prévenir de la désactivation du partenaire et donc de sa structure par affiliation
+                        $maiList = $usersList[$structure->getUserId()]->getUserMail();
+                    }
+                }
+
+                // on envoie les mails
+                if(SEND_EMAIL){
+                    foreach ($maiList as $mail){
+                        Helper::sendMail($mail, 'Bonjour, le partenaire '. $partnerUpdate->getPartnerName().' à été désactiver, par conséquent votre structure est elle aussi désactivé. <br> si cela est temporaire lors de la réactivation du partenaire votre structure reprendra sont status avant désactivation', 'Prime-Fitness : Désactivation de votre compte structure');
+                    }
+                    Helper::sendMail('mail partner', 'Bonjour, votre access partenaire pour '. $partnerUpdate->getPartnerName().' à été désactivé, par conséquent toutes vos structure s\'en trouve affecté est sont dorénavent aussi désactivé', 'Prime-Fitness : Désactivation de votre compte partenaire');
+                }
+
             }
+            else{
+                $this->generateView(array('title' => 'Erreur', 'msgError' => 'Oups : Le partenaire n\'existe pas !'), 'error', 'error');
+            }
+
         }
         /*if(self::isValidCsrf()){
 
@@ -692,99 +702,109 @@ class ControllerForm extends ControllerSecuredAdmin {
             $err['service_type'] = $this->request->existParameter('service_type') && in_array($this->request->getParameter('service_type'), $type);
             $err['service_type_id'] = $this->request->existParameter('service_type_id') && is_numeric($this->request->getParameter('service_type_id')) > 0;
 
-            if($err['service_id'] && $err['service_type'] && $err['service_type_id']){
+            if($err['service_id'] && $err['service_type'] && $err['service_type_id']) {
 
                 // On retrouve le partenaire
                 $partner = $this->partner->getPartnerByPartnerId($this->request->getParameter('service_type_id'));
 
-                // On retrouve l'utilisateur
-                $partnerUser = new Users();
-                $partnerUser->getUser($partner->getUserId());
+                if ($partner->getPartnerId() > 0) {
+                    // On retrouve l'utilisateur
+                    $_user = new User();
+                    $partnerUser = $_user->getUser($partner->getUserId());
 
-                /**
-                 * Suppression d'un service sur le partenaire
-                 */
-                if($this->request->getParameter('service_type') == 'remove'){
+                    /**
+                     * Suppression d'un service sur le partenaire
+                     */
+                    if ($this->request->getParameter('service_type') == 'remove') {
 
-                    // On récupère les informations du Partner Service
-                    $partnerService = new PartnersServices();
-                    $partner_service = $partnerService->getPartnerService($this->request->getParameter('service_id'));
+                        // On récupère les informations du Partenaire Service
+                        $partnerService = new PartnerService();
+                        $partner_service = $partnerService->getPartnerService($this->request->getParameter('service_id'));
 
-                    // On récupère le Service
-                    $service = new Services();
-                    $formService = $service->getService($partner_service->getServiceId());
+                        if ($partner_service->getServiceId() > 0) {
+                            // On récupère le Service
+                            $service = new Service();
+                            $formService = $service->getService($partner_service->getServiceId());
 
-                    // on retrouve la liste des structures service du partenaire qui possède la structure et utilisateurs concernés
-                    $structureService = new StructuresServices();
-                    $listStructureService = $structureService->getStructureServiceListByPartnerServiceId($this->request->getParameter('service_id'));
+                            // on retrouve la liste des structures service du partenaire qui possède la structure et utilisateurs concernés
+                            $structureService = new StructureService();
+                            $listStructureService = $structureService->getStructureServiceListByPartnerServiceId($this->request->getParameter('service_id'));
 
-                    $structureKey = array_keys($listStructureService);
+                            $structureKey = array_keys($listStructureService);
 
-                    // on va initialisez une liste de mail vide et on les ajoutera s'il y en a
-                    $mails = [];
+                            // on va initialisez une liste de mail vide et on les ajoutera s'il y en a
+                            $mails = [];
 
-                    // on récupère les informations des structures s'il y en a
-                    if(count($structureKey) >= 1) {
-                        $structure = new Structures();
-                        $structuresEditList = $structure->getStructureListByStructuresId($structureKey);
+                            // on récupère les informations des structures s'il y en a
+                            if (count($structureKey) >= 1) {
+                                $structure = new Structure();
+                                $structuresEditList = $structure->getStructureListByStructuresId($structureKey);
 
-                        $userKey = array_keys($structuresEditList);
+                                $userKey = array_keys($structuresEditList);
 
-                        // on récupère les informations des utilisateurs concernés
-                        $userEdit = new Users();
-                        $usersEditList = $userEdit->getUserListByUsersId($userKey);
+                                // on récupère les informations des utilisateurs concernés
+                                $userEdit = new User();
+                                $usersEditList = $userEdit->getUserListByUsersId($userKey);
 
-                        /** Étape suivante, on doit supprimer sur les structures la relation avec le service du partenaire */
-                        if(count($structuresEditList) >= 1) {
-                            foreach ($structuresEditList as $_structure) {
-                                $struc = $structuresEditList[$_structure->getUserId()]; // la structure
-                                $usr = $usersEditList[$_structure->getUserId()];        // l'user
-                                $structServ = $listStructureService[$struc->getStructureId()]; // la structure service
-                                $this->structurerService->deleteStructureServiceById($structServ->getStructureServiceId());
-                                $mails[] = $usr->getUserMail();
+                                /** Étape suivante, on doit supprimer sur les structures la relation avec le service du partenaire */
+                                if (count($structuresEditList) >= 1) {
+                                    foreach ($structuresEditList as $_structure) {
+                                        $struc = $structuresEditList[$_structure->getUserId()]; // la structure
+                                        $usr = $usersEditList[$_structure->getUserId()];        // l'user
+                                        $structServ = $listStructureService[$struc->getStructureId()]; // la structure service
+                                        $this->structurerService->deleteStructureServiceById($structServ->getStructureServiceId());
+                                        $mails[] = $usr->getUserMail();
+                                    }
+                                }
                             }
-                        }
-                    }
-                    $remove = $this->partnerService->addUpdateRemoveService( $this->request->getParameter('service_id'), $this->request->getParameter('service_type_id'), 2);
+                            $remove = $this->partnerService->addUpdateRemoveService($this->request->getParameter('service_id'), $this->request->getParameter('service_type_id'), 2);
 
-                    // si la suppression à fonctionner
-                    if($remove) {
-                        // On prévient chaque structure et le partenaire par mail
-                        if(SEND_EMAIL){
-                            // Envoi de l'email à toutes les structures
-                            foreach($mails as $mail){
-                                Helper::sendMail($mail, sprintf(MAIL_BODY_SERVICE_DELETED_STRUCTURE, $partner->getPartnerName(), $formService->getServiceName()), MAIL_OBJECT_SERVICE_DELETED);
+                            // si la suppression à fonctionner
+                            if ($remove) {
+                                // On prévient chaque structure et le partenaire par mail
+                                if (SEND_EMAIL) {
+                                    // Envoi de l'email à toutes les structures
+                                    foreach ($mails as $mail) {
+                                        Helper::sendMail($mail, sprintf(MAIL_BODY_SERVICE_DELETED_STRUCTURE, $partner->getPartnerName(), $formService->getServiceName()), MAIL_OBJECT_SERVICE_DELETED);
+                                    }
+                                    // Envoi de l'email au partenaire
+                                    Helper::sendMail($partnerUser->getUserMail(), sprintf(MAIL_BODY_SERVICE_DELETED_PARTNER, $partner->getPartnerName(), $formService->getServiceName()), MAIL_OBJECT_SERVICE_DELETED);
+                                }
+                                $this->redirect('/partner/information/' . $this->request->getParameter('service_type_id'));
+                            } else
+                                $this->generateView(array('title' => 'Erreur : Suppression refusé', 'msgError' => 'Il reste actuellement des structure avec le service que vous essayer de supprimer actif sur ce partenaire !'), 'error', 'error');
+
+                        } else
+                            $this->generateView(array('title' => 'OULALALA', 'msgError' => 'Il se pourrais bien, avec une certitude d\'environ 100% que vous avez modifier le formulaire ;) !'), 'error', 'error');
+                    } /**
+                     * Ajout d'un nouveau service sur le partenaire
+                     */
+                    elseif ($this->request->getParameter('service_type') == 'add') {
+
+                        $add = $this->partnerService->addUpdateRemoveService($this->request->getParameter('service_id'), $this->request->getParameter('service_type_id'));
+
+                        // On récupère les informations du service
+                        $service = $this->partnerService->getInformationService($this->request->getParameter('service_id'));
+
+                        if ($add) {
+                            //Envoie d'un mail au partenaire pour lui signaler que le service a été ajouter
+                            if (SEND_EMAIL) {
+                                Helper::sendMail($partnerUser->getUserMail(), sprintf(MAIL_BODY_NEW_SERVICE, $service->service_name), MAIL_OBJECT_NEW_SERVICE);
                             }
-                            // Envoi de l'email au partenaire
-                            Helper::sendMail($partnerUser->getUserMail(), sprintf(MAIL_BODY_SERVICE_DELETED_PARTNER, $partner->getPartnerName(), $formService->getServiceName()), MAIL_OBJECT_SERVICE_DELETED);
+                            //Redirection vers le partenaire
+                            $this->redirect('/partner/information/' . $this->request->getParameter('service_type_id'));
                         }
-                        $this->redirect('/partner/information/' . $this->request->getParameter('service_type_id'));
-                    }
-                    else
-                        $this->generateView(array( 'title' => 'Erreur : Suppression refusé', 'msgError' => 'Il reste actuellement des structure avec le service que vous essayer de supprimer actif sur ce partenaire !'), 'error', 'error');
-                }
-
-                /**
-                 * Ajout d'un nouveau service sur le partenaire
-                 */
-                elseif($this->request->getParameter('service_type') == 'add'){
-
-                    $add = $this->partnerService->addUpdateRemoveService($this->request->getParameter('service_id'), $this->request->getParameter('service_type_id'));
-
-                    // On récupère les informations du service
-                    $service = $this->partnerService->getInformationService($this->request->getParameter('service_id'));
-
-                    if($add){
-                        //Envoie d'un mail au partenaire pour lui signaler que le service a été ajouter
-                        if(SEND_EMAIL){
-                            Helper::sendMail($partnerUser->getUserMail(), sprintf(MAIL_BODY_NEW_SERVICE, $service->service_name), MAIL_OBJECT_NEW_SERVICE);
+                        else {
+                            $this->generateView(array('title' => 'Erreur : refusé', 'msgError' => 'Oups, ce partenaire possédè déjà ce service !'), 'error', 'error');
                         }
-                        //Redirection vers le partenaire
-                        $this->redirect('/partner/information/' . $this->request->getParameter('service_type_id'));
                     }
-                    else{$this->generateView(array('title' => 'Erreur : refusé', 'msgError' => 'Oups, ce partenaire possédè déjà ce service !'), 'error', 'error');}
+                    else {
+                        $this->generateView(array('title' => 'Erreur : Paramètre incorrect', 'msgError' => 'Oups, certain paramètre passer ne sont pas bon...'), 'error', 'error');
+                    }
                 }
-                else{$this->generateView(array('title' => 'Erreur : Paramètre incorrect', 'msgError' => 'Oups, certain paramètre passer ne sont pas bon...'), 'error', 'error');}
+                else{
+                    $this->generateView(array('title' => 'OLA Amigo', 'msgError' => 'Salut, tu as perdu quelque chose est tu essaie de le retrouvez en modifiant un formulaire ? :)'), 'error', 'error');
+                }
             }
             else{$this->generateView(array('title' => 'Erreur : Paramètre incorrect', 'msgError' => 'Oups les paramètre passer ne sont pas correct...'), 'error', 'error');}
         }

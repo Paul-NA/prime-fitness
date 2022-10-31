@@ -60,7 +60,7 @@ class View
         // Génération du gabarit commun utilisant la partie spécifique
         $view = $this->genRender(PATH_VIEW.((($changeLayout != null) ? $changeLayout : 'Layout').'.php'),
                 [
-                    'titre' => $this->titre, 
+                    'titre' => $this->titre ?? null,
                     'contenu' => $contenu, 
                     'cssText' => $cssText, 
                     'cssFiles' => $cssFiles, 
@@ -73,9 +73,9 @@ class View
     }
 
     /**
-     * Génère un fichier vue et renvoie le résultat produit
+     * Génère un fichier vu et renvoie le résultat produit
      *
-     * @param string $fichier Chemin du fichier vue à générer
+     * @param string $fichier Chemin du fichier vu à générer
      * @param array $donnees Données nécessaires à la génération de la vue
      * @return string Résultat de la génération de la vue
      * @throws Exception Exception Si le fichier vue est introuvable
@@ -87,7 +87,7 @@ class View
             extract($donnees);
             // Démarrage de la temporisation de sortie
             ob_start();
-            // Inclut le fichier vue
+            // Inclut le fichier vu
             // Son résultat est placé dans le tampon de sortie
             require $fichier;
             // Arrêt de la temporisation et renvoi du tampon de sortie

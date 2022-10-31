@@ -1,8 +1,8 @@
 <?php
 
 use Application\Core\ControllerSecured;
-use Application\Models\Partners;
-use Application\Models\Structures;
+use Application\Models\Partner;
+use Application\Models\Structure;
 
 /**
  * Contrôleur de la page d'accueil
@@ -13,6 +13,7 @@ class ControllerHome extends ControllerSecured {
      * Redirection vers la bonne page
      */
     public function index() : void {
+
         $session = $this->request->getSession();
         // si l'utilisateur à un role admin
         if($this->isAdmin()){
@@ -22,17 +23,16 @@ class ControllerHome extends ControllerSecured {
         // si l'utilisateur à un role partenaire
         else if($this->isPartner()){
             // on va récupérer l'id du partenaire et redirigé vers sa page
-            $partner = new Partners();
-            $partner->getPartnerByUserId($session->getAttribute('user_id'));
+            $partner = new Partner();
+            $partenaire = $partner->getPartnerByUserId($session->getAttribute('user_id'));
             
-            $this->redirect('/partner/information/'.$partner->getPartnerId());
+            $this->redirect('/partner/information/'.$partenaire->getPartnerId());
         }
         // si l'utilisateur à un role structure
         else if($this->isStructure()){
             // on va récupérer l'id de sa structure et redirigé vers sa structure
-            $structure = new Structures();
-            $structure->setUserId($session->getAttribute('user_id'));
-            $returnStructure = $structure->getStructureByUserId();
+            $structure = new Structure();
+            $returnStructure = $structure->getStructureByUserId($session->getAttribute('user_id'));
 
             $this->redirect('/structure/information/'.$returnStructure->getStructureId());
         }

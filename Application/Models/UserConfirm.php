@@ -3,7 +3,7 @@ namespace Application\Models;
 
 use Application\Core\Database;
 
-class UserConfirmModel{
+class UserConfirm{
 
     private int $user_id;
     private string $user_key;
@@ -40,6 +40,14 @@ class UserConfirmModel{
         $this->user_key = $user_key;
     }
 
+
+
+
+
+    /*****************************************************/
+    /*               liste des fonctions                 */
+    /*****************************************************/
+
     /**
      * On enregistre une nouvelle entrée
      * @return void
@@ -57,6 +65,11 @@ class UserConfirmModel{
         $query = 'DELETE FROM users_confirm WHERE user_id = :user_id';
         Database::q($query, [':user_id' => $this->user_id]);
     }
+
+
+    /*****************************************************/
+    /*               fonctions à refaire                 */
+    /*****************************************************/
 
     /**
      * Check si la clé existe sinon 0

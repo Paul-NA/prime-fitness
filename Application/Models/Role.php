@@ -3,7 +3,7 @@ namespace Application\Models;
 
 use Application\Core\Database;
 
-class Roles{
+class Role{
 
     private int $role_id;
     private string $role_name;

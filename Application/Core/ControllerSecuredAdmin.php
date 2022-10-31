@@ -6,6 +6,7 @@ namespace Application\Core;
  */
 abstract class ControllerSecuredAdmin extends Controller
 {
+
     public function execAction($action)
     {
         // Si les infos client sont présentes dans la session ...

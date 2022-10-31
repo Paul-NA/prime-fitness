@@ -3,7 +3,7 @@ namespace Application\Models;
 
 use Application\Core\Database;
 
-class Services{
+class Service{
 
     private int $service_id;
     private string $service_name;
@@ -70,29 +70,31 @@ class Services{
         $this->service_active = $service_active;
     }
 
-
+    /**
+     * @return array
+     */
     public function getAllServices() : array{
         $query = 'SELECT * FROM services';
         $servicesList = Database::q($query);
         if ($servicesList->rowCount() >= 1){
-            return array_column($servicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\Services'), null, 'service_id');
+            return array_column($servicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\Service'), null, 'service_id');
         }
         return array();
     }
 
     /**
      * @param int $service_id
-     * @return Services
+     * @return Service
      */
-    public function getService(int $service_id) : Services{
+    public function getService(int $service_id) : Service{
         $query = 'SELECT * FROM services where service_id = :service_id';
         $servicesList = Database::q($query, [
                             ':service_id' => $service_id
                         ]);
         if ($servicesList->rowCount() == 1){
-            $servicesList->setFetchMode(\PDO::FETCH_CLASS, 'Application\Models\Services');
+            $servicesList->setFetchMode(\PDO::FETCH_CLASS, 'Application\Models\Service');
             return $servicesList->fetch();
         }
-        return new Services();
+        return new Service();
     }
 }

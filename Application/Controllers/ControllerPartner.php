@@ -1,20 +1,20 @@
 <?php
 use Application\Core\ControllerSecured;
-use Application\Models\Partners;
-use Application\Models\PartnersServices;
-use Application\Models\Services;
-use Application\Models\Structures;
-use Application\Models\Users;
+use Application\Models\Partner;
+use Application\Models\PartnerService;
+use Application\Models\Service;
+use Application\Models\Structure;
+use Application\Models\User;
 
 /**
  * Contrôleur de la page Partenaire
  */
 class ControllerPartner extends ControllerSecured {
 
-    private Users $user;
+    //  private Users $user;
 
     public function __construct() {
-        $this->user = new Users();
+        $this->user = new User();
     }
     
     /**
@@ -28,38 +28,39 @@ class ControllerPartner extends ControllerSecured {
      */
     public function information(){
 
-        $currentUser = new Users();
-        $currentUser->getUSer($this->request->getSession()->getAttribute("user_id"));
+        $user = new User();
+        $currentUser = $user->getUser($this->request->getSession()->getAttribute("user_id"));
 
         // on vérifie que l'on ait bien un id partenaire
         if($this->request->existParameter('id') && is_numeric($this->request->getParameter('id'))){
-            $partner = new Partners();
+            $partner = new Partner();
             $infosPartner = $partner->getPartnerByPartnerId($this->request->getParameter('id'));
 
             // Si le partenaire existe et que l'on est admin ou un partenaire ou que c'est notre page
             if($infosPartner->getPartnerId() > 0 &&(($currentUser->getRoleId() == ROLE_ADMIN) || ($currentUser->getRoleId() == ROLE_PARTNER && $currentUser->getUserId() == $infosPartner->getUSerId()))){
 
                 // User partner
-                $partnerUser = new Users();
-                $partnerUser->getUser($infosPartner->getUserId());
+                $userPart = new User();
+                $partnerUser = $userPart->getUser($infosPartner->getUserId());
 
                 // On doit vérifier si l'id de la structure existe sinon on redirigera vers la liste des partenaires
-                $services = new Services();
+                $services = new Service();
                 $servicesList = $services->getAllServices();
+                //var_dump($servicesList);
 
                 // On doit vérifier si l'id de la structure existe sinon on redirigera vers la liste des partenaires
-                $partnerService = new PartnersServices();
+                $partnerService = new PartnerService();
                 $servicesPartner = $partnerService->getPartnerServiceListByPartnerId($infosPartner->getPartnerId());
 
                 // On doit récupérer la liste des structures du partenaire
-                $structure = new Structures();
+                $structure = new Structure();
                 $structureList = $structure->getStructureListByPartnerId($infosPartner->getPartnerId());
 
                 //On récupère les clées des structures (structure_id)
                 $userKey = array_keys($structureList);
 
                 // Ici on va récupérer la liste des utilisateurs de chaque structure
-                $structureUser = new Users();
+                $structureUser = new User();
                 $structureUserList = (count($userKey) >= 1) ? $structureUser->getUserListByUsersId($userKey) : [];
 
                 // On génère un csrf
@@ -72,7 +73,7 @@ class ControllerPartner extends ControllerSecured {
                 $this->generateView(
                     // paramètre à envoyé à la vue
                     array(
-                        'user_info' => $currentUser,
+                        //'user_info' => $currentUser,
                         'user_partner_info' => $partnerUser,
                         'partner_info' => $infosPartner,
                         'form_success'=> $mess_success,
@@ -102,7 +103,7 @@ class ControllerPartner extends ControllerSecured {
     public function list(){
         if($this->request->getSession()->getAttribute('user_role') == ROLE_ADMIN) {
 
-            $partner = new Partners();
+            $partner = new Partner();
             $totalPage = ceil($partner->getTotalPartner() / NUMBER_ITEM_PER_PAGE);
 
             // On génère un csrf
@@ -120,7 +121,7 @@ class ControllerPartner extends ControllerSecured {
                  */
                 $userKey = array_keys($listPartner);
 
-                $u = new Users();
+                $u = new User();
                 $userList = (count($userKey) > 0) ? $u->getUserListByUsersId($userKey) : [];
 
                 if($page+1 <= $totalPage || $partner->getTotalPartner() == 0) {

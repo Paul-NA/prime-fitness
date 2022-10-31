@@ -1,7 +1,7 @@
 <?php
 namespace Application\Core;
 
-use Application\Models\Users;
+use Application\Models\User;
 
 /**
  * Classe abstraite contrôleur. 
@@ -12,7 +12,7 @@ abstract class Controller
     /**
      * Utilisateur courant
      */
-    private Users $user;
+    protected User $user;
 
     /**
      * Action à réaliser
@@ -71,8 +71,8 @@ abstract class Controller
 
         // on ajoute l'utilisateur aux données de la vue s'il est connecté
         if($this->isLogged()){
-            $user = new Users();
-            $this->user = $user->getUserv2($this->request->getSession()->getAttribute("user_id"));
+            $user = new User();
+            $this->user = $user->getUser($this->request->getSession()->getAttribute("user_id"));
             // vérifie que l'utilisateur est bien réel, et que l'utilisateur est actif
             if($this->user->getUserId() > 0 && $this->user->isUserActive()) {
                 $donneesVue['current_user'] = $this->user;
@@ -148,4 +148,5 @@ abstract class Controller
     {
         return $this->request->getSession()->existAttribute("user_id");
     }
+
 }

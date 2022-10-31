@@ -3,7 +3,7 @@ namespace Application\Models;
 
 use Application\Core\Database;
 
-class LogsModel{
+class Log{
 
     private int $log_id;
     private string $log_type;

@@ -3,9 +3,12 @@ namespace Application\Models;
 
 use Application\Core\Database;
 
-class PartnersServices{
+class PartnerService{
 
-    private int $partner_service_id, $partner_id, $service_id, $partner_service_active;
+    private int $partner_service_id = 0;
+    private int $partner_id = 0;
+    private int $service_id = 0;
+    private int $partner_service_active;
 
     /**
      * @return int
@@ -135,19 +138,19 @@ class PartnersServices{
 
     /**
      * @param int $partner_service_id
-     * @return PartnersServices
+     * @return PartnerService
      */
-    public function getPartnerService(int $partner_service_id) : PartnersServices{
+    public function getPartnerService(int $partner_service_id) : PartnerService{
         $query = 'SELECT * from partners_services WHERE partner_service_id = :partner_service_id';
         $partnerService = Database::q($query, [
             ':partner_service_id' => $partner_service_id
         ]);
         if ($partnerService->rowCount() == 1){
-            $partnerService->setFetchMode(\PDO::FETCH_CLASS, 'Application\Models\PartnersServices');
+            $partnerService->setFetchMode(\PDO::FETCH_CLASS, 'Application\Models\PartnerService');
             return $partnerService->fetch();
         }
         else{
-            return new PartnersServices();
+            return new PartnerService();
         }
     }
 
@@ -168,25 +171,9 @@ class PartnersServices{
         $query = 'Select * from partners_services where partner_id = :partner_id ';
         $partnerServicesList = Database::q($query, [':partner_id' => $partner_id]);
         if ($partnerServicesList->rowCount() >= 1){
-            return array_column($partnerServicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\PartnersServices'), null, 'service_id'); //$structureList->fetchAll(\PDO::FETCH_OBJ);
+            return array_column($partnerServicesList->fetchAll(\PDO::FETCH_CLASS, 'Application\Models\PartnerService'), null, 'service_id'); //$structureList->fetchAll(\PDO::FETCH_OBJ);
         }
         return array();
-    }
-
-
-    public function getServiceStructure(int $partner_id, int $structure_id): array {
-        $query = 'Select partners_services.partner_service_id, partner_id, service_name, partners_services.service_id, structure_service_id, 
-                        partners_services.partner_service_active as partner_service_active, 
-                        structures_services.structure_service_active as structure_service_active from partners_services 
-                            LEFT JOIN structures_services ON partners_services.partner_service_id = structures_services.partner_service_id 
-                            LEFT JOIN services ON partners_services.service_id = services.service_id 
-                        where partners_services.partner_id = :partner_id and (structures_services.structure_id = :structure_id OR structures_services.structure_id is null) 
-                        ORDER BY services.service_name';
-        $servicesList = Database::q($query, [':partner_id' => $partner_id ,':structure_id' => $structure_id]);
-        if ($servicesList->rowCount() >= 1){
-            return $servicesList->fetchAll(\PDO::FETCH_OBJ);
-        }
-        return [];
     }
 
 }

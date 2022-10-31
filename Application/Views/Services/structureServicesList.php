@@ -28,7 +28,7 @@ if(!empty($services_partner)){
                                 <div class="float-start">'.$this->cleanHTML($service->getServiceName()).'</div>
                                 <div class="justify-content-end">
                                     <button class="btn badge btn-'.(($service_structure !== null && $partner_active) ? 'success' : ((!$partner_active) ? 'warning' : 'danger')).'"'.
-                                    (($user_info->getRoleId() == ROLE_ADMIN)
+                                    (($current_user->getRoleId() == ROLE_ADMIN)
                                             ?
                                         ' id="partnerID-'.$service->getServiceId().'" 
                                         data-bs-toggle="modal" 
