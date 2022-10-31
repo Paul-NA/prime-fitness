@@ -21,12 +21,31 @@ CREATE TABLE IF NOT EXISTS roles (
   role_name varchar(45) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Insérons les Roles disponible
+INSERT INTO roles (role_name)
+    VALUES
+        ('Administrateur'),
+        ('Partenaire'),
+        ('Structure');
+
 -- Création de la table "services"
 CREATE TABLE IF NOT EXISTS services (
   service_id int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   service_name varchar(40) NOT NULL,
   service_description varchar(1000) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Insérons un peu de contenue pour les services
+INSERT INTO services (service_name, service_description)
+    VALUES
+        ('Mailing Service', 'Système de mailing pour les clients'),
+        ('Distributeur de boisson', 'Ajouter à vos/votre salle de sport des points de distribution de boisson.'),
+        ('1 Animateur Fitness 1j/semaine', 'Nous vous envoyons une personne connu et reconnu dans le milieux afin d\'attirer de nouveau membres'),
+        ('Publicité locale', 'Nous assurons la publicité de votre salle de sport dans votre localité avec des encart publicitaire jusqu\'à 30km alentour'),
+        ('Spot télévisé', 'Nous vous proposons de redirigé vous les appel téléphonique au alentour de chez vous vers vos salle lors de nos campagne publicitaire'),
+        ('Service repas', 'Proposer un coin lunch avec des repas spécialement étudier, faire du sport c\'est bien mais bien manger aussi '),
+        ('Website Personnalisé', 'Mettez votre site en ligne et attirer plus de client avec notre gestionnaire de site personnalisé'),
+        ('Concours régional', 'Faites participé vos membre au concours régional et fidélisé les plus gros client!');
 
 -- Création de la table "users"
 -- avec la FK sur le role_id de la table roles
@@ -43,6 +62,12 @@ CREATE TABLE IF NOT EXISTS users (
   role_id int(11) NOT NULL,
   FOREIGN KEY (role_id) REFERENCES roles (role_id) on delete cascade
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Insérons l'administrateur - mot de passe en clair : E54Ffzyr!re
+INSERT INTO users (user_firstname, user_lastname, user_mail, user_password, user_phone, user_address, user_active, role_id)
+    VALUES
+        ('Paul', 'Naval', 'admin@yopmail.com', '$2y$10$8FcrBprfnKC8WD7DZCeDXuOyAqFGv2YWuMCekQkTk7TjzFstUEgKG', 987654321, '1 rue de la grange 19000 Tulle', 1, 1);
+
 
 CREATE TABLE IF NOT EXISTS users_confirm (
     user_id int(11) PRIMARY KEY NOT NULL,
