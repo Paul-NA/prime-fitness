@@ -5,3 +5,4 @@ appengine-generated/
 .idea/*
 .env
 envOnline.php
+/Application/Config-online/*
