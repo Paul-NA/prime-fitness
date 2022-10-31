@@ -153,62 +153,73 @@ class ControllerForm extends ControllerSecuredAdmin {
             $this->checkFormRegex('inputAddress', REGEX_ADDRESS) ? '' : $err['Address'] = 1;
             $this->checkFormRegex('partner_id', REGEX_PARTNER_ID) ? '' : $err['partner_id'] = 1;
             if(count($err)> 0){
-                print_r($err);
-                //$this->redirect('/partner');
+                $this->generateView(array('title' => 'Erreur', 'msgError' => 'Désolé il y a une erreur dans le formulaire !'), 'error', 'error');
             }
             else {
-                //creation de l'utilisateur et récupération de l'id
-                $newUser = new User();
-                $newUser->setUserFirstname($this->request->getParameter('inputFirstName'));
-                $newUser->setUserLastname($this->request->getParameter('inputLastName'));
-                $newUser->setUserMail($this->request->getParameter('inputEmail'));
-                $newUser->setUserPassword(bin2hex(random_bytes(24))); // un mot de passe aléatoire inutilisable (pour ne pas laisser vide)
-                $newUser->setUserPhone($this->request->getParameter('inputPhone'));
-                $newUser->setUserAddress($this->request->getParameter('inputAddress'));
-                $newUser->setRoleId(ROLE_STRUCTURE);
-                $user_id = $newUser->addUser(); // Retourne le LastInsertId()
+                $_partner = new Partner();
+                $partner = $_partner->getPartnerByPartnerId($this->request->getParameter('partner_id'));
 
-                $confirmKey = md5(bin2hex(random_bytes(32)));
-                // Création du lien pour que l'utilisateur valide son compte
-                $user_confirm = new UserConfirm();
-                $user_confirm->setUserId($user_id);
-                $user_confirm->setUserKey($confirmKey);
-                $user_confirm->addUserConfirm();
+                if($partner->getPartnerId() > 0) {
+                    \Application\Core\Database::start_transaction();
+                    $_user = new User();
+                    $partner_user = $_user->getUser($partner->getUserId());
 
-                //Ajout d'une nouvelle structure
-                $structure = new Structure();
-                $structure->setPartnerId($this->request->getParameter('partner_id'));
-                $structure->setUserId($user_id);
-                $structure->setStructureName($this->request->getParameter('inputSocialName'));
-                $id_structure = $structure->addStructure(); // Retourne le LastInsertId()
+                    //creation de l'utilisateur et récupération de l'id
+                    $newUser = new User();
+                    $newUser->setUserFirstname($this->request->getParameter('inputFirstName'));
+                    $newUser->setUserLastname($this->request->getParameter('inputLastName'));
+                    $newUser->setUserMail($this->request->getParameter('inputEmail'));
+                    $newUser->setUserPassword(bin2hex(random_bytes(24))); // un mot de passe aléatoire inutilisable (pour ne pas laisser vide)
+                    $newUser->setUserPhone($this->request->getParameter('inputPhone'));
+                    $newUser->setUserAddress($this->request->getParameter('inputAddress'));
+                    $newUser->setRoleId(ROLE_STRUCTURE);
+                    $user_id = $newUser->addUser(); // Retourne le LastInsertId()
+
+                    $confirmKey = md5(bin2hex(random_bytes(32)));
+                    // Création du lien pour que l'utilisateur valide son compte
+                    $user_confirm = new UserConfirm();
+                    $user_confirm->setUserId($user_id);
+                    $user_confirm->setUserKey($confirmKey);
+                    $user_confirm->addUserConfirm();
+
+                    //Ajout d'une nouvelle structure
+                    $structure = new Structure();
+                    $structure->setPartnerId($this->request->getParameter('partner_id'));
+                    $structure->setUserId($user_id);
+                    $structure->setStructureName($this->request->getParameter('inputSocialName'));
+                    $id_structure = $structure->addStructure(); // Retourne le LastInsertId()
 
 
-                $partnerService = new PartnerService();
-                $listPartnerServices  = $partnerService->getPartnerServiceListByPartnerId($this->request->getParameter('partner_id'));
+                    $partnerService = new PartnerService();
+                    $listPartnerServices = $partnerService->getPartnerServiceListByPartnerId($this->request->getParameter('partner_id'));
 
-                /**
-                 * On a récupéré les listes des services du partenaire, on va ajouter les services actifs sur la structure
-                 */
-                foreach ($listPartnerServices as $partner_Service){
-                    if($partner_Service->getPartnerServiceActive()) {
-                        $structureService = new StructureService();
-                        $structureService->setStructureId($id_structure);
-                        $structureService->setPartnerServiceId($partner_Service->getPartnerServiceId());
-                        $structureService->addStructureService();
+                    /**
+                     * On a récupéré les listes des services du partenaire, on va ajouter les services actifs sur la structure
+                     */
+                    foreach ($listPartnerServices as $partner_Service) {
+                        if ($partner_Service->getPartnerServiceActive()) {
+                            $structureService = new StructureService();
+                            $structureService->setStructureId($id_structure);
+                            $structureService->setPartnerServiceId($partner_Service->getPartnerServiceId());
+                            $structureService->addStructureService();
+                        }
                     }
-                }
 
-                $message = sprintf(MAIL_BODY_NEW_STRUCTURE, $confirmKey);
-                if (SEND_EMAIL) {
-                    Helper::sendMail($this->request->getParameter('inputEmail'), $message, MAIL_TITLE_NEW_STRUCTURE); // Mail pour le gérant de la structure
-                    //Helper::sendMail($user_mail_partner, $message, MAIL_TITLE_NEW_PARTNER_STRUCTURE); // Mail pour le partenaire
+                    \Application\Core\Database::end_transaction_commit();
+                    $message = sprintf(MAIL_BODY_NEW_STRUCTURE, $confirmKey);
+                    if (SEND_EMAIL) {
+                        Helper::sendMail($this->request->getParameter('inputEmail'), $message , MAIL_TITLE_NEW_STRUCTURE); // Mail pour le gérant de la structure
+                        Helper::sendMail($partner_user->getUserMail(), 'Bonjour, Une nouvelle structure viens d\'etre ajouter à votre compte.', MAIL_TITLE_NEW_PARTNER_STRUCTURE); // Mail pour le partenaire
+                    }
+                    $this->redirect('/structure/information/' . $id_structure);
                 }
-
-                $this->redirect('/structure/information/' . $id_structure);
+                else{
+                    $this->generateView(array('title' => 'Erreur', 'msgError' => 'Oups : le partenaire n\'existe pas !'), 'error', 'error');
+                }
             }
         }
         else{
-            die('mauvais csrf');
+            $this->generateView(array('title' => 'Csrf erreur', 'msgError' => 'Oups : il y à un petit problème avec le code CSRF ;)'), 'error', 'error');
         }
     }
 
@@ -678,13 +689,13 @@ class ControllerForm extends ControllerSecuredAdmin {
                 }
                 else{
                     //on pourrait afficher un page personnalisé pour l\'erreur, mais manque de temps
-                    die('Oups : Non mais les services ne sont que pour les structure et partenaire aucune autre option n\'est disponible');
+                    $this->generateView(array('title' => 'Erreur de mise à jour', 'msgError' => 'Oups : Non mais les services ne sont que pour les structure et partenaire aucune autre option n\'est disponible'), 'error', 'error');
                 }
 
             }
             else{
                 //on pourrait afficher un page personnalisé pour l\'erreur, mais manque de temps
-                die('Oups les paramètre passer ne sont pas bon... ');
+                $this->generateView(array('title' => 'Csrf erreur', 'msgError' => 'Oups : les paramètre passer ne sont pas bon...'), 'error', 'error');
             }
         }
         else{
