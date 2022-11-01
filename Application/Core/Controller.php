@@ -57,8 +57,7 @@ abstract class Controller
     /**
      * Génère la vue associée au contrôleur courant
      */
-    protected function generateView(array $donneesVue = array(), string $action = null, $changeController = null, $changeLayout = null)
-    {
+    protected function generateView(array $donneesVue = array(), string $action = null, $changeController = null, $changeLayout = null){
         // Utilisation de l'action actuelle par défaut
         $actionVue = $this->action;
         if ($action != null) {
@@ -92,8 +91,7 @@ abstract class Controller
     /**
      * Effectue une redirection vers une url simplement
      */
-    protected function redirect(string $route) : void
-    {
+    protected function redirect(string $route) : void{
         header('Location:' . URI_ROOT . $route);
     }
 
@@ -125,27 +123,23 @@ abstract class Controller
         ($this->request->getSession()->existAttribute('flash_success')) ?? $this->request->getSession()->deleteAttribute('flash_success');
         ($this->request->getSession()->existAttribute('flash_error')) ?? $this->request->getSession()->deleteAttribute('flash_success');
     }
+
     public function isAdmin() : bool{
-        //var_dump($this->user);
-        //return $this->isLogged() && $this->user->getRoleId() == ROLE_ADMIN;
         return $this->isLogged() && $this->request->getSession()->getAttribute('user_role') == ROLE_ADMIN;
     }
 
     public function isPartner() : bool{
-        //return $this->isLogged() && $this->user->getRoleId() == ROLE_PARTNER;
         return $this->isLogged() && $this->request->getSession()->getAttribute('user_role') == ROLE_PARTNER;
     }
 
     public function isStructure() : bool{
-        //return $this->isLogged() && $this->user->getRoleId() == ROLE_STRUCTURE
         return $this->isLogged() && $this->request->getSession()->getAttribute('user_role') == ROLE_STRUCTURE;
     }
 
     /**
      * Retourne un bool pour savoir si l'utilisateur est connecté
      */
-    public function isLogged() : bool
-    {
+    public function isLogged() : bool{
         return $this->request->getSession()->existAttribute("user_id");
     }
 
