@@ -9,13 +9,12 @@ class Helper
      */
     static function sendMail(string $mailDest, string $message, string $object) : bool
     {
-        $headers = [
-            'MIME-Version' => '1.0',  // Version MIME
-            'Content-type' => 'text/html; charset=ISO-8859-1', // l'en tete Content-type pour le format HTML
-            'Reply-To' => EMAIL_SYSTEM, // Mail de réponse
-            'From' => EMAIL_NAME, // Expéditeur
-            'Delivered-to' => $mailDest // Destinataire
-        ];
+        $headers = array(
+            'MIME-Version' => '1.0',
+            'Content-type' => 'text/html; charset=UTF-8',
+            'From' => EMAIL_NAME. ' <'.EMAIL_SYSTEM.'>',
+            'X-Mailer' => 'PHP/' . phpversion()
+        );
         return mail($mailDest, $object, $message, $headers);
     }
     

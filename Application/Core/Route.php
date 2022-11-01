@@ -54,8 +54,8 @@ class Route
             require(PATH_CONTROLLER.$classeController.'.php');
         }
         // la page n'existe pas !
-        else if  (file_exists(PATH_CONTROLLER.CONTROLLER_BASENAME.CONTROLLER_ERROR.'.php')){
-            $classeController = CONTROLLER_BASENAME.CONTROLLER_ERROR;
+        else if  (file_exists(PATH_CONTROLLER.CONTROLLER_BASENAME.ucfirst(CONTROLLER_ERROR).'.php')){
+            $classeController = CONTROLLER_BASENAME.ucfirst(CONTROLLER_ERROR);
             require(PATH_CONTROLLER.$classeController.'.php');
         }
         else{
