@@ -9,12 +9,6 @@ class Route
     public function routeRequest()
     {
         try {
-            // Fusion des paramètres GET et POST de la requête
-            // Permet de gérer uniformément ces deux types de requête HTTP
-            //$get['get'] = $_GET;
-            //$post['post'] = $_POST;
-            //$absolutePathToEnvFile = PATH_CONF . '/.env';
-
             $request = new HttpQuery(array_merge($_GET, $_POST));
             $controller = $this->createController($request);
             $action = $this->createAction($request);

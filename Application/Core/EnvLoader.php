@@ -4,8 +4,6 @@ namespace Application\Core;
 class EnvLoader
 {
     /**
-     * The directory where the .env file can be located.
-     *
      * @var string
      */
     protected $path;
