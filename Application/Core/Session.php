@@ -12,6 +12,7 @@ class Session
     public function __construct()
     {
 
+        session_set_cookie_params(MAX_LIFETIME, null, $_SERVER['HTTP_HOST'], HTTP_SECURE, HTTP_ONLY);
         session_start();
         if(session_name() == 'PHPSESSID'){
             session_destroy();
