@@ -9,6 +9,7 @@ class Route
     public function routeRequest()
     {
         try {
+            // TODO ce serait bien de ne pas merge GET et POST, mais de les traiter séparément (bientôt)
             $request = new HttpQuery(array_merge($_GET, $_POST));
             $controller = $this->createController($request);
             $action = $this->createAction($request);
