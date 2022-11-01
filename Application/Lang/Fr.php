@@ -15,12 +15,22 @@ const MAIL_TITLE_NEW_PARTNER_STRUCTURE = 'Une Structure vient d\'être ajouté s
 const MAIL_TITLE_SERVICE_EDITED_STRUCTURE = '';
 const MAIL_TITLE_SERVICE_EDITED_PARTNER = '';
 
-const MAIL_BODY_NEW_PARTNER = '';
+const MAIL_BODY_NEW_PARTNER = '<div style="width: 100%;">Bonjour et bienvenue chez prime-Fitness<br />'
+    . '<br /> '
+    . 'Afin de validé votre compte <b>Partenaire</b> et pouvoir vous connecter, vous devez suivre le lien ci-dessous pour créer votre mot de passe !<br /><br />'
+    . '<b>Attention :</b> nous ne pouvont pas retrouvez votre pas le mot de passe, veillez à noté quelque part afin de ne pas le perdre !'
+    . '<br />'
+    . '<b>Lien pour créer votre mot de passe :</b>  <a href="' . URI_ROOT . '/user/confirm/%1$s"> ' . URI_ROOT . '/user/confirm/%1$s</a><br /> '
+    . '<b>Page de connexion :</b> <a href="' . URI_ROOT . '/user/login">' . URI_ROOT . '/user/login</a><br />'
+    . '<br />'
+    . 'Merci de votre attention,'
+    . 'l\'équipe Prime-Fitness.'
+    . '</div>';;
 
 // Creation d'un nouveau compte Structure
 const MAIL_BODY_NEW_STRUCTURE = '<div style="width: 100%;">Bonjour et bienvenue chez prime-Fitness<br />'
     . '<br /> '
-    . 'Afin de validé votre compte vous devez suivre le lien ci-dessous pour créer votre mot de passe !<br /><br />'
+    . 'Afin de validé votre compte <b>Structure</b> et pouvoir vous connecter vous devez suivre le lien ci-dessous pour créer votre mot de passe !<br /><br />'
     . '<b>Attention :</b> nous ne pouvont pas retrouvez votre pas le mot de passe, veillez à noté quelque part afin de ne pas le perdre !'
     . '<br />'
     . '<b>Lien pour créer votre mot de passe :</b>  <a href="' . URI_ROOT . '/user/confirm/%1$s"> ' . URI_ROOT . '/user/confirm/%1$s</a><br /> '
@@ -51,16 +61,26 @@ const MAIL_BODY_SERVICE_EDITED_PARTNER = '<div style="width: 100%;">Bonjour, '
     . 'l\'équipe Prime-Fitness.'
     . '</div>';
 
-// Contenue du mail pour les partenaires si un service est édité sur leur compte
-const MAIL_BODY_SERVICE_EDITED_STRUCTURE = '<div style="width: 100%;">Bonjour, '
-    . '<br />'
-    . '<br />'
-    . 'Le services <b>%1$s</b> vient d\'être modifié sur votre partenaire, cela prend effet aussi sur votre compte'
-    . '<br />'
-    . '<br />'
-    . 'Merci de votre attention,'
-    . 'l\'équipe Prime-Fitness.'
-    . '</div>';
+// Contenue du mail pour le partenaire si un service est édité sur une de leur structure avec le nom de la structure, le nom du service et le nouveau status
+const MAIL_BODY_SERVICE_EDITED_PARTNER_STRUCTURE = '<div style="width: 100%;">Bonjour, <br />
+            <br />
+            Le services <b>%1$s</b> vient d\'être modifié sur votre structure <b>%2$s</b>, son nouveau status est maintenant <b>%3$s</b>
+            <br />
+            <br />
+            Merci de votre attention,
+            l\'équipe Prime-Fitness.
+            </div>';
+
+// Contenue du mail pour la structure si un service est édité sur leur compte, avec le nom du service et le nouveau status
+const MAIL_BODY_SERVICE_EDITED_STRUCTURE = '<div style="width: 100%;">Bonjour,  
+            <br />
+            <br />
+            Le services <b>%1$s</b> vient d\'être modifié sur votre compte, son nouveau status est maintenant <b>%2$s</b><br />.
+            Votre partenaire a également été informé de cette modification !<br />
+            <br />
+            Merci de votre attention,
+            l\'équipe Prime-Fitness.
+            </div>';
 
 
 // Creation d'un nouveau compte Structure
