@@ -85,33 +85,32 @@ class ControllerForm extends ControllerSecuredAdmin {
 
                         // On va créer une liste d'email à contacter
                         $listEmail = [];
-                        $delUser->getUserMail();
+                        $partMail = $delUser->getUserMail();
+
                         if(count($userKey) >= 1) {
                             // Maintenant on va récupérer la liste des utilisateurs et leurs informations et les delete
                             $users = new User();
                             $usersList = $users->getUserListByUsersId($userKey);
-
-
 
                             // on parcourt la liste et on récupère seulement les emails que l'on ajoute au tableau créer juste avant
                             foreach ($usersList as $user) {
                                 $listEmail[] = $user->getUserMail();
                                 // on ne supprime pas les utilisateurs un par un mais avec la liste que l'on a récupéré (les requêtes sql dans les boucles, ce n'est pas bien).
                             }
+                            if($delUser->deleteUsersList($userKey)){
+
+                            }
+                            else{
+                                die('erreur');
+                            }
                         }
 
-                        if($delUser->deleteUsersList($userKey)){
-
-                        }
-                        else{
-                            die('erreur');
-                        }
 
                         // On supprime le partenaire par la suite
                         $delUser->deleteUser($delUser->getUserId());
 
                         if(SEND_EMAIL){
-                            Helper::sendMail($delUser->getUserMail(), 'Bonjours, votre compte ainsi que toutes les donnée associer, ainsi que toutes vos structure et leur données associer on été supprimer', 'Suppression de votre votre et informations');
+                            Helper::sendMail($partMail, 'Bonjours, votre compte ainsi que toutes les donnée associer, ainsi que toutes vos structure et leur données associer on été supprimer', 'Suppression de votre votre et informations');
                             foreach ($listEmail as $mail){
                                 Helper::sendMail($mail, 'Bonjours, vote compte ainsi que toutes les données associer on été supprimer de notre base de donnée.', 'Suppression de votre compte et donnée associer');
                             }
@@ -124,12 +123,21 @@ class ControllerForm extends ControllerSecuredAdmin {
                     elseif ($delUser->getRoleId() == ROLE_STRUCTURE) {
 
                     }
+                    else{
+                        $this->generateView(array('title' => 'Oh le vilain', 'msgError' => 'Petit filou, on ne supprime pas un administrateur ;)'), 'error', 'error');
+                    }
                 }
-                else{ die('erreur de suppression id user = 0'); }
+                else{
+                    $this->generateView(array('title' => 'Oh la boulette', 'msgError' => 'Oups : je pense qu\'il y as un problème vous essayer de supprimer un utilisateur qui n\'existe pas !'), 'error', 'error');
+                }
             }
-            else { var_dump($_POST); die('oups'); }
+            else {
+                $this->generateView(array('title' => 'Oh Nooo', 'msgError' => 'Oups : Le formulaire viens de raconter une histoire, celle d\'une erreur, l\histoire se nomme "<b>Vouloir se faire passer pour un chiffre alors qu\'il ne l\'ai pas</b>" !'), 'error', 'error');
+            }
         }
-        else{ $this->generateView(array('title' => 'Csrf erreur', 'msgError' => 'Oups : il y à un petit problème avec le code CSRF ;)'), 'error', 'error'); }
+        else{
+            $this->generateView(array('title' => 'Csrf erreur', 'msgError' => 'Oups : il y à un petit problème avec le code CSRF ;)'), 'error', 'error');
+        }
     }
 
 
@@ -446,7 +454,7 @@ class ControllerForm extends ControllerSecuredAdmin {
                     \Application\Core\Database::end_transaction_commit();
                     if(SEND_EMAIL) {
                         $message = sprintf(MAIL_BODY_NEW_PARTNER, $confirm_hash);
-                        Helper::sendMail($this->request->getParameter('inputEmail'), $message, MAIL_TITLE_NEW_PARTNER_STRUCTURE); // Mail pour le partenaire
+                        Helper::sendMail($this->request->getParameter('inputEmail'), $message, MAIL_TITLE_NEW_PARTNER); // Mail pour le partenaire
                     }
 
 
@@ -652,23 +660,59 @@ class ControllerForm extends ControllerSecuredAdmin {
 
             if($err['service_id'] && $err['service_active'] && $err['service_type'] && $err['service_type_id']){
 
+                /**
+                 * Pour les structures
+                 */
                 if($this->request->getParameter('service_type') == 'structure'){
-                    // il faudrait récupérer les informations du partenaire pour lui envoyé un mail
 
-                    $editService = $this->structurerService->addRemoveService( $this->request->getParameter('service_id'), $this->request->getParameter('service_type_id'), $this->request->getParameter('service_active') );
-                    if($editService){
+                    $_structure = new structure();
+                    $structure = $_structure->getStructure($this->request->getParameter('service_type_id'));
 
-                        /**
-                         * Modification on envoie les mails
-                         */
-                        if(SEND_EMAIL){
-                            // blabla envoie d'email... à la structure et au partenaire pour les prévenirs
+                    if($structure->getStructureId() > 0) {
+                        // On retrouve le partenaire
+                        $_partner = new Partner();
+                        $partner = $_partner->getPartnerByPartnerId($structure->getPartnerId());
+
+                        $_structureUser = new User();
+                        $structureUser = $_structureUser->getUser($structure->getUserId());
+
+                        $_partnerUser = new User();
+                        $partnerUser = $_partnerUser->getUser($partner->getUserId());
+
+                        $_partnerService = new PartnerService();
+                        $partnerService = $_partnerService->getPartnerService($this->request->getParameter('service_id'));
+
+                        if($partnerService->getPartnerServiceId() > 0) {
+                            $_service = new Service();
+                            $service = $_service->getService($partnerService->getServiceId());
+
+                            // il faudrait récupérer les informations du partenaire pour lui envoyé un mail
+                            $editService = $this->structurerService->addRemoveService($partnerService->getPartnerServiceId(), $structure->getStructureId(), $this->request->getParameter('service_active'));
+
+                            if ($editService) {
+                                /**
+                                 * Modification on envoie les mails
+                                 */
+                                if (SEND_EMAIL) {
+                                    $status = (($this->request->getParameter('service_active')) ? 'Actif' : 'Inactif');
+                                    // Envoi de l'email au partenaire
+                                    Helper::sendMail($partnerUser->getUserMail(), sprintf(MAIL_BODY_SERVICE_EDITED_PARTNER_STRUCTURE, $service->getServiceName(), $structure->getStructureName(), $status), MAIL_OBJECT_SERVICE_EDITED_ON_STRUCTURE);
+                                    // Envoi de l'email à la structure
+                                    Helper::sendMail($structureUser->getUserMail(), sprintf(MAIL_BODY_SERVICE_EDITED_STRUCTURE, $service->getServiceName(), $status), MAIL_OBJECT_SERVICE_EDITED);
+                                }
+                                $this->redirect('/structure/information/' . $this->request->getParameter('service_type_id'));
+
+                            } else {
+                                $this->generateView(array('title' => 'Erreur de mise à jour', 'msgError' => 'Oups : désolé une erreur c\'est surement glisser dans le formulaire, mais cela n\'a pu aboutir !'), 'error', 'error');
+                            }
                         }
-                        $this->redirect('/structure/information/'.$this->request->getParameter('service_type_id'));
-
+                        else{
+                            $this->generateView(array('title' => 'c\'est fâcheux', 'msgError' => 'Se service n\'est absolument pas proposé, encore entrain d\'essayer de modifier les formulaires ?'), 'error', 'error');
+                        }
                     }
-                    else
-                        $this->generateView(array('title' => 'Erreur de mise à jour', 'msgError' => 'Oups : désolé une erreur c\'est surement glisser dans le formulaire, mais cela n\'a pu aboutir !'), 'error', 'error');
+                    else{
+                        $this->generateView(array('title' => 'Ah bin ça alors', 'msgError' => 'Cette structure à l\'air d\'avoir un sérieux problème, pour être un peut plus précis elle existe pas :)'), 'error', 'error');
+                    }
                 }
 
                 //Pour les partenaires
@@ -688,11 +732,12 @@ class ControllerForm extends ControllerSecuredAdmin {
                     else
                         $this->generateView(array('title' => 'Erreur de mise à jour', 'msgError' => 'Oups : désolé une erreur c\'est surement glisser dans le formulaire, mais cela n\'a pu aboutir !'), 'error', 'error');
                 }
+
+                //bin sinon erreur uoi
                 else{
                     //on pourrait afficher un page personnalisé pour l\'erreur, mais manque de temps
                     $this->generateView(array('title' => 'Erreur de mise à jour', 'msgError' => 'Oups : Non mais les services ne sont que pour les structure et partenaire aucune autre option n\'est disponible'), 'error', 'error');
                 }
-
             }
             else{
                 //on pourrait afficher un page personnalisé pour l\'erreur, mais manque de temps
