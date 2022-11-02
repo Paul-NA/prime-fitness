@@ -101,7 +101,7 @@ class ControllerForm extends ControllerSecuredAdmin {
 
                             }
                             else{
-                                die('erreur');
+                                $this->generateView(array('title' => 'Oh mince', 'msgError' => 'Il semblerai la suppression des utilisateurs à échouer !'), 'error', 'error');
                             }
                         }
 
@@ -121,7 +121,34 @@ class ControllerForm extends ControllerSecuredAdmin {
                      *
                      */
                     elseif ($delUser->getRoleId() == ROLE_STRUCTURE) {
+                        //On va rechercher les structure lier afin de récupérer tous les utilisateurs associer
+                        $structures = new Structure();
+                        $structure = $structures->getStructureByUserId($this->request->getParameter('user_id'));
 
+                        if($structure->getPartnerId() > 0 ) {
+                            $partner = new Partner();
+                            $partnerInfo = $partner->getPartnerByPartnerId($structure->getPartnerId());
+
+                            $_userS = new User();
+                            $structureUser = $_userS->getUser($structure->getUserId());
+
+                            $_userP = new User();
+                            $partnerUser = $_userP->getUser($partnerInfo->getUserId());
+
+                            if($_userS->deleteUser($structureUser->getUserId())) {
+                                if (SEND_EMAIL) {
+                                    Helper::sendMail($structureUser->getUserMail(), 'Bonjours, votre compte ainsi que toutes les donnée associer on été supprimer', 'Suppression de votre votre et informations');
+                                    Helper::sendMail($partnerUser->getUserMail(), 'Bonjours, La structure ' . $structure->getStructureName() . ' viens d\'être surpprimé, toutes les informations la concernant on également été supprimé', 'Suppression d\'une de vos structure et de ses informations');
+                                }
+                                $this->redirect('/partner/information/'.$partnerInfo->getPartnerId());
+                            }
+                            else{
+                                $this->generateView(array('title' => 'Oh Mer.. ! ', 'msgError' => 'Désolé une erreur est survenue la suppression de la structure et toutes les information la concernant à échoué!'), 'error', 'error');
+                            }
+                        }
+                        else{
+                            $this->generateView(array('title' => 'Oh Noo ! ', 'msgError' => 'C\'est balo cette structure n\'extiste pas'), 'error', 'error');
+                        }
                     }
                     else{
                         $this->generateView(array('title' => 'Oh le vilain', 'msgError' => 'Petit filou, on ne supprime pas un administrateur ;)'), 'error', 'error');
