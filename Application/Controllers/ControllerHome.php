@@ -25,16 +25,23 @@ class ControllerHome extends ControllerSecured {
             // on va récupérer l'id du partenaire et redirigé vers sa page
             $partner = new Partner();
             $partenaire = $partner->getPartnerByUserId($session->getAttribute('user_id'));
-            
-            $this->redirect('/partner/information/'.$partenaire->getPartnerId());
+            // Permet en cas de redirection de vérifier si l'utilisateur connecté (s'il a une session) de vérifier que son partenaire< existe réellement sinon on le déconnecte
+            if($partenaire->getPartnerId() > 0)
+                $this->redirect('/partner/information/'.$partenaire->getPartnerId());
+            else{
+                $this->redirect('/user/logout');
+            }
         }
         // si l'utilisateur à un role structure
         else if($this->isStructure()){
             // on va récupérer l'id de sa structure et redirigé vers sa structure
             $structure = new Structure();
             $returnStructure = $structure->getStructureByUserId($session->getAttribute('user_id'));
-
-            $this->redirect('/structure/information/'.$returnStructure->getStructureId());
+            // Permet en cas de redirection de vérifier si l'utilisateur connecté (s'il a une session) de vérifier que sa structure existe réellement sinon on le déconnecte
+            if($returnStructure->getStructureId() > 0)
+                $this->redirect('/structure/information/'.$returnStructure->getStructureId());
+            else
+                $this->redirect('/user/logout');
         }
         // ni admin, ni partenaire, ni structure il y à un gros soucis
         else{
