@@ -33,7 +33,7 @@ if(!defined('URI_ROOT')) die('heu non désolé :)');
                             <label for="inputFirstName" class="form-label">Status de l'utilisateur</label>
                             <div  class="m-2 form-check form-switch">
                                 <input class="form-check-input inputUserActive" type="checkbox" id="SwitchUserActive"  name="inputUserActive">
-                                <label class="form-check-label" for="SwitchUserActive"> Activé/désactivé l'utilisateur </label>
+                                <label class="form-check-label" for="SwitchUserActive"> Activer/désactiver l'utilisateur </label>
                             </div>
 
 
@@ -58,7 +58,7 @@ if(!defined('URI_ROOT')) die('heu non désolé :)');
                             <label for="inputFirstName" class="form-label">Status du partneraire</label>
                             <div class="m-2 form-check form-switch">
                                 <input class="form-check-input inputPartnerActive" type="checkbox" id="SwitchPartnerActive" name="inputPartnerActive">
-                                <label class="form-check-label" for="SwitchPartnerActive"> Activé/désactivé le partenaire </label>
+                                <label class="form-check-label" for="SwitchPartnerActive"> Activer/désactiver le partenaire </label>
                             </div>
 
                             <input type="<?php echo ((FORM_DEBUG === true) ? 'text' : 'hidden');?>" name="type" value="edit_partner">

@@ -33,7 +33,7 @@ if(!defined('URI_ROOT')) die('heu non désolé :)');
                             <label for="inputFirstName" class="form-label">Status de l'utilisateur</label>
                             <div  class="m-2 form-check form-switch">
                                 <input class="form-check-input inputUserActive" type="checkbox" id="SwitchUserActive"  name="inputUserActive">
-                                <label class="form-check-label" for="SwitchUserActive"> Activé/désactivé l'utilisateur </label>
+                                <label class="form-check-label" for="SwitchUserActive"> Activer/désactiver l'utilisateur </label>
                             </div>
 
                         </div>
@@ -58,7 +58,7 @@ if(!defined('URI_ROOT')) die('heu non désolé :)');
                             <label for="inputFirstName" class="form-label">Status de la structure</label>
                             <div class="m-2 form-check form-switch">
                                 <input class="form-check-input inputStructureActive" type="checkbox" id="SwitchStructureActive" name="inputStructureActive">
-                                <label class="form-check-label" for="SwitchStructureActive"> Activé/désactivé le structure </label>
+                                <label class="form-check-label" for="SwitchStructureActive"> Activer/désactiver le structure </label>
                             </div>
 
                             <input type="<?php echo ((FORM_DEBUG === true) ? 'text' : 'hidden');?>"  class="inputStructureId" name="inputStructureId">
