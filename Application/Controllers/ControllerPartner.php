@@ -114,7 +114,7 @@ class ControllerPartner extends ControllerSecured {
                 /**
                  * On a récupéré notre liste de partenaire et on à retourné la liste avec comme clé de tableau les user_id pour selectioner les users
                  */
-                $listPartner = $partner->searchB('', $page);
+                $listPartner = $partner->search('', $page);
 
                 /**
                  * On récupère les clés sur la liste

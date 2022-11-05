@@ -75,7 +75,7 @@ class ControllerAjax extends ControllerSecuredAdmin {
          * On a récupéré notre liste de partenaire et on à retourné la liste avec comme clé de tableau les user_id pour selectioner les users
          */
         $partner = new Partner();
-        $listPartner = $partner->searchB($search, $page, (($status == 'actif') ? true : (($status == 'inactif') ? false : null)));
+        $listPartner = $partner->search($search, $page, (($status == 'actif') ? true : (($status == 'inactif') ? false : null)));
 
         /**
          * On récupère les clés sur la liste

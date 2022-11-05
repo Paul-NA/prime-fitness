@@ -25,7 +25,7 @@ class ControllerHome extends ControllerSecured {
             // on va récupérer l'id du partenaire et redirigé vers sa page
             $partner = new Partner();
             $partenaire = $partner->getPartnerByUserId($session->getAttribute('user_id'));
-            // Permet en cas de redirection de vérifier si l'utilisateur connecté (s'il a une session) de vérifier que son partenaire< existe réellement sinon on le déconnecte
+            // Permet en cas de redirection de vérifier si l'utilisateur connecté (s'il a une session) de vérifier que son partenaire existe réellement sinon on le déconnecte
             if($partenaire->getPartnerId() > 0)
                 $this->redirect('/partner/information/'.$partenaire->getPartnerId());
             else{

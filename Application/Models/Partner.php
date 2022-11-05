@@ -1,10 +1,7 @@
 <?php
 namespace Application\Models;
-
 use Application\Core\Database;
-
 class Partner{
-
     private int $partner_id = 0;
     private string $partner_name = '';
     private int $user_id = 0;
@@ -17,7 +14,6 @@ class Partner{
     {
         return $this->partner_active;
     }
-
     /**
      * @param bool $partner_active
      */
@@ -25,8 +21,6 @@ class Partner{
     {
         $this->partner_active = $partner_active;
     }
-
-
     /**
      * @param string $partner_name
      */
@@ -34,14 +28,12 @@ class Partner{
     {
         $this->partner_name = $partner_name;
     }
-
     /**
      * @return string
      */
     public function getPartnerName() : string{
         return $this->partner_name;
     }
-
     /**
      * @return int
      */
@@ -55,7 +47,9 @@ class Partner{
     {
         $this->user_id = $user_id;
     }
-
+    /**
+     * @return int
+     */
     public function getUserId() : int{
         return $this->user_id;
     }
@@ -63,8 +57,6 @@ class Partner{
     /**********************************************************/
     /*                      Fonction                          */
     /**********************************************************/
-
-
     /**
      * @param int $partner_id
      * @return Partner
@@ -78,9 +70,7 @@ class Partner{
         else
             return new Partner();
     }
-
-
-    /**
+        /**
      * @param int $user_id
      * @return Partner
      */
@@ -95,23 +85,22 @@ class Partner{
             return new Partner();
         }
     }
-
     /**
-     * @param string $search
+     * @param string $search_partner_name
      * @param int $page
      * @param $partner_active
      * @param $oderBy
      * @return array
      */
-    public function searchB(string $search, int $page, $partner_active = null, $oderBy = null) : array{
+    public function search(string $search_partner_name, int $page, $partner_active = null, $oderBy = null) : array{
         $query = 'Select * from partners WHERE partner_name LIKE :partner_name'
             . ((is_bool($partner_active)) ? ' and partner_active = :partner_active' : '')
             . ' Limit :page, '.NUMBER_ITEM_PER_PAGE;
         if(is_bool($partner_active)){
-            $param = [':partner_name' => "%$search%", ':page' => ($page*NUMBER_ITEM_PER_PAGE), ':partner_active' => (($partner_active) ? 1 : 0) ];
+            $param = [':partner_name' => "%$search_partner_name%", ':page' => ($page*NUMBER_ITEM_PER_PAGE), ':partner_active' => (($partner_active) ? 1 : 0) ];
         }
         else{
-            $param = [':partner_name' => "%$search%", ':page' => ($page*NUMBER_ITEM_PER_PAGE) ];
+            $param = [':partner_name' => "%$search_partner_name%", ':page' => ($page*NUMBER_ITEM_PER_PAGE) ];
         }
         $partnerServicesList = Database::q($query, $param);
         if ($partnerServicesList->rowCount() >= 1){
@@ -119,7 +108,6 @@ class Partner{
         }
         return array();
     }
-
     /**
      * @return bool
      */
@@ -138,7 +126,6 @@ class Partner{
         }
         return true;
     }
-
     /**
      * @return int
      */
@@ -146,7 +133,6 @@ class Partner{
         $totalPartner = Database::q('SELECT count(*) as total from partners');
         return $totalPartner->fetch(\PDO::FETCH_OBJ)->total;
     }
-
     /**
      * @param string $partner_name
      * @param int $user_id
@@ -168,5 +154,4 @@ class Partner{
             return 0;
         }
     }
-
 }
