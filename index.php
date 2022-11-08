@@ -17,8 +17,8 @@ $route->routeRequest();
  * 3 : /user/login                      -FINI-  (obligatoire)           (ADMIN/STRUCTURE/PARTNER)       (page de connexion)
  * 4 : /user/confirm/{id}               -FINI-  (obligatoire)           (ADMIN/STRUCTURE/PARTNER)       (sert à la validation d'un compte)
  * 
- * 5 : /structure/information/{id}              (obligatoire)           (ADMIN/STRUCTURE)               (pour voir les informations de la structure)
- * 6 : /partner/information/{id}        -WIP-   (obligatoire)           (ADMIN/PARTNER)                 (pour voir les informations du partenaire avec ces structures)
+ * 5 : /structure/information/{id}      -FINI-  (obligatoire)           (ADMIN/STRUCTURE)               (pour voir les informations de la structure)
+ * 6 : /partner/information/{id}        -FINI-  (obligatoire)           (ADMIN/PARTNER)                 (pour voir les informations du partenaire avec ces structures)
  *
  * **************************************************************************************************
  *                                      ADMIN ONLY
@@ -26,11 +26,11 @@ $route->routeRequest();
  *
  * 7 : /partner/list                    -FINI-  (obligatoire)           (ADMIN)                         (Liste tous les partenaires)
  * 10: /API/search                      -WIP-   (obligatoire)           (ADMIN)                         (ce n'est pas réellement une page, c'est pour voir les recherche dynamique)
- * 11: /post/* tous les form admin
+ * 11: /form/*                          -FINI-  tous les form admin
  *
  *
  *
- * 12: /services/list (en admin permet d'ajouter/désactiver des services)
+ * 12: /services/list       (en admin permet d'ajouter/désactiver des services)
  * 13: /services/post       (soumission du formulaire pour ajouter un service)
  * 14: /user/profil         (pas obligatoire) (pour voir ses information
  * 15: /user/logs           (pas obligatoire) (voir les logs de connexion)

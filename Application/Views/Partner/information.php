@@ -9,7 +9,7 @@ array_push($this->jsFiles, URI_ROOT.'/Assets/Javascript/application.js');
 
 include PATH_VIEW.'_header.php';
 
-if(!empty($user_partner_info)) :
+if(!empty($user_partner_info) && !empty($current_user) && !empty($csrf_token)) :
 ?>
 
 <main>

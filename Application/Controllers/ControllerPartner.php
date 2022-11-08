@@ -11,15 +11,9 @@ use Application\Models\User;
  */
 class ControllerPartner extends ControllerSecured {
 
-    //  private Users $user;
-
-    public function __construct() {
-        $this->user = new User();
-    }
-    
     /**
      * Page /partner
-     * Cette page n'est pas accessible par défaut, on va rediriger vers l'index qui redirigera vers la bonne page
+     * Cette page n'est pas accessible par défaut, on va rediriger vers l'index qui redirigera suivant le role de l'utilisateur
      */
     public function index() {$this->redirect('/');}
 
@@ -37,7 +31,7 @@ class ControllerPartner extends ControllerSecured {
             $infosPartner = $partner->getPartnerByPartnerId($this->request->getParameter('id'));
 
             // Si le partenaire existe et que l'on est admin ou un partenaire ou que c'est notre page
-            if($infosPartner->getPartnerId() > 0 &&(($currentUser->getRoleId() == ROLE_ADMIN) || ($currentUser->getRoleId() == ROLE_PARTNER && $currentUser->getUserId() == $infosPartner->getUSerId()))){
+            if($infosPartner->getPartnerId() > 0 && (($currentUser->getRoleId() == ROLE_ADMIN) || ($currentUser->getRoleId() == ROLE_PARTNER && $currentUser->getUserId() == $infosPartner->getUSerId()))){
 
                 // User partner
                 $userPart = new User();
@@ -46,7 +40,6 @@ class ControllerPartner extends ControllerSecured {
                 // On doit vérifier si l'id de la structure existe sinon on redirigera vers la liste des partenaires
                 $services = new Service();
                 $servicesList = $services->getAllServices();
-                //var_dump($servicesList);
 
                 // On doit vérifier si l'id de la structure existe sinon on redirigera vers la liste des partenaires
                 $partnerService = new PartnerService();
@@ -99,6 +92,7 @@ class ControllerPartner extends ControllerSecured {
     /**
      * /partner/list
      * /partner/list/(int){pageNumber}
+     * (accessible seulement pour les administrateurs
      */
     public function list(){
         if($this->request->getSession()->getAttribute('user_role') == ROLE_ADMIN) {
@@ -122,6 +116,9 @@ class ControllerPartner extends ControllerSecured {
                 $userKey = array_keys($listPartner);
 
                 $u = new User();
+                /**
+                 * On retourne la liste des Users de chaque partenaire classé par user_id
+                 */
                 $userList = (count($userKey) > 0) ? $u->getUserListByUsersId($userKey) : [];
 
                 if($page+1 <= $totalPage || $partner->getTotalPartner() == 0) {
@@ -141,4 +138,5 @@ class ControllerPartner extends ControllerSecured {
         }
         else{ $this->generateView(array('title' => 'Oh non!', 'msgError' => 'cette page ne vous est pas accessible !'), 'error', 'error'); }
     }
+
 }

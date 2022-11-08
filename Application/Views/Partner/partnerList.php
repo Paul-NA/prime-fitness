@@ -5,6 +5,7 @@ if(!defined('URI_ROOT')) die('heu non désolé :)');
 /**
  * Ce fichier sert de modèle pour afficher la liste des structures
  */
+if(!empty($total_partner) && !empty($partner_list) && !empty($partner_list_user)) :
     $total_page = ceil($total_partner / NUMBER_ITEM_PER_PAGE);
     echo Application\Core\Helper::paginate($total_page, $current_page, URI_ROOT.'/partner/list/');
 ?>
@@ -38,4 +39,5 @@ if(!defined('URI_ROOT')) die('heu non désolé :)');
                  ?>
             </ol>  
         </div>
-<?php echo Application\Core\Helper::paginate($total_page, $current_page, URI_ROOT.'/partner/list/');?>
+<?php echo Application\Core\Helper::paginate($total_page, $current_page, URI_ROOT.'/partner/list/');
+endif;

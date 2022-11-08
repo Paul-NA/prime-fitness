@@ -79,7 +79,7 @@ include PATH_VIEW.'_header.php';
                                             <b>Prénom :</b> <?php echo $this->cleanHTML($user_structure_info->getUserFirstName());?><br />
                                             <b>Téléphone :</b> <?php echo $this->cleanHTML($user_structure_info->getUserPhone());?><br />
                                             <b>Mail :</b> <?php echo $this->cleanHTML($user_structure_info->getUserMail());?><br />
-                                            <b>Status user partner: </b> <?php echo (($user_structure_info->isUserActive()) ? '<b style="color: green">Actif</b>' : '<b   style="color: red">Inactif</b>');?><br />
+                                            <b>Status user structure: </b> <?php echo (($user_structure_info->isUserActive()) ? '<b style="color: green">Actif</b>' : '<b   style="color: red">Inactif</b>');?><br />
                                         </p>
                                     </div>
                                 </div>
@@ -89,7 +89,8 @@ include PATH_VIEW.'_header.php';
                                         <p class="card-text">
                                             <b>Nom :</b> <?php echo $this->cleanHTML($structure_info->getStructureName());?><br />
                                             <b>Adresse :</b> <?php echo $this->cleanHTML($user_structure_info->getUserAddress());?><br />
-                                            <b>Status partner: </b> <?php echo (($structure_info->getStructureActive()) ? '<b style="color: green">Actif</b>' : '<b   style="color: red">Inactif</b>');?><br />
+                                            <b>Status partenaire: </b> <?php echo (($partner_info->getPartnerActive()) ? '<b style="color: green">Actif</b>' : '<b   style="color: red">Inactif</b>');?> <a href="<?php echo URI_ROOT.'/partner/information/'.$partner_info->getPartnerId();?> ">Voir le partenaire</a><br />
+                                            <b>Status structure: </b> <?php echo (($structure_info->getStructureActive() && $partner_info->getPartnerActive()) ? '<b style="color: green">Actif</b>' : '<b   style="color: red">Inactif</b>');?><br />
                                         </p>
                                     </div>
                                 </div>

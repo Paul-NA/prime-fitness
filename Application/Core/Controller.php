@@ -29,16 +29,14 @@ abstract class Controller
     /**
      * Définit la requête entrante
      */
-    public function setRequest(HttpQuery $request)
-    {
+    public function setRequest(HttpQuery $request){
         $this->request = $request;
     }
 
     /**
      * Exécute l'action à réaliser en appelant la méthode portant le même nom que l'action sur l'objet Controller courant
      */
-    public function execAction($action)
-    {
+    public function execAction($action){
         if (method_exists($this, $action)) {
             $this->action = $action;
             $this->{$this->action}();
@@ -59,11 +57,8 @@ abstract class Controller
      */
     protected function generateView(array $donneesVue = array(), string $action = null, $changeController = null, $changeLayout = null){
         // Utilisation de l'action actuelle par défaut
-        $actionVue = $this->action;
-        if ($action != null) {
-            // Utilisation de l'action passée en paramètre
-            $actionVue = $action;
-        }
+        $actionVue = ($action != null) ? $action : $this->action;
+
         // Utilisation du nom du contrôleur actuel
         $classeController = ($changeController === null ) ? get_class($this) : $changeController;
         $controllerView = str_replace("Controller", "", $classeController);
